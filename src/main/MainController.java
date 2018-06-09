@@ -46,7 +46,7 @@ public class MainController {
     public Pane gamePanel;
 
     private int count = 0;
-    private static boolean help = false;
+    private static boolean againAttack = false;
     private static int oldPlaceX;
     private static int oldPlaceY;
     private static boolean haveAttack;
@@ -57,7 +57,7 @@ public class MainController {
     private Group groupHighlight = new Group();
     private final int HEIGHT = 8;
     private final int WIDTH = 8;
-    private static volatile List<Pair<ImageView, Pair<Integer, Integer>>> link;
+    private static List<Pair<ImageView, Pair<Integer, Integer>>> link;
     private Image contour = new Image("main/fxml/Contour.png");
     private Image hatchCell = new Image("main/fxml/Hatching.png");
 
@@ -86,7 +86,7 @@ public class MainController {
         link.add(new Pair<>(w10, new Pair<>(2, 7)));
         link.add(new Pair<>(w11, new Pair<>(4, 7)));
         link.add(new Pair<>(w12, new Pair<>(6, 7)));
-        MainController.link= link;
+        MainController.link = link;
     }
 
     private void setBoard(int[][] board) {
@@ -124,7 +124,17 @@ public class MainController {
     }
 
     public void btnRestart(ActionEvent actionEvent) {
-
+        gamePanel.getChildren().remove(groupHighlight);
+        for (Pair<ImageView, Pair<Integer,Integer>> pair: link) {
+            gamePanel.getChildren().remove(pair.getKey());
+        }
+        setLink(new ArrayList<>());
+        setBoard(new int[8][8]);
+        player = 1;
+        for (Pair<ImageView, Pair<Integer,Integer>> pair: link) {
+            pair.getKey().relocate(pair.getValue().getKey()*80, pair.getValue().getValue()*80);
+            gamePanel.getChildren().add(pair.getKey());
+        }
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
@@ -139,8 +149,8 @@ public class MainController {
     }
 
     private void highlightAndPossibleMoves(int x, int y) {
-        if (!help) {
-            if (board[x][y] == player) {
+        if (!againAttack) {
+            if (board[x][y] % 10 == player) {
                 int[][] clone = cloneBoard(board);
                 gamePanel.getChildren().remove(groupHighlight);
                 groupHighlight.getChildren().clear();
@@ -162,7 +172,6 @@ public class MainController {
                 }
             }
         }
-        System.out.println(boardCopy[x][y]);
         if (boardCopy[x][y] == 3) {
             board = boardCopy;
             gamePanel.getChildren().remove(groupHighlight);
@@ -176,12 +185,12 @@ public class MainController {
                 possibleAttack(x, y, clone);
                 gamePanel.getChildren().remove(groupHighlight);
                 if (haveAttack) {
-                    help = true;
+                    againAttack = true;
                     clone = possibleAttack(x, y, clone);
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
                 } else {
-                    help = false;
+                    againAttack = false;
                     turnPlayer();
                 }
             }
@@ -196,17 +205,29 @@ public class MainController {
         groupHighlight.getChildren().add(viewContour);
         int count = 0;
         for (int i=1; i<3; i++) {
-            for (int j=1; j<3; j++){
-                int newX = (int) (x + pow(-1, i) * 2);
-                int newY = (int) (y + pow(-1, j) * 2);
-                if (isOnBoard(newX, newY) &&  clone[newX][newY]==0 &&
-                        clone[newX-(int) pow(-1, i)][newY-(int) pow(-1, j)] == getOpponent(player)) {
-                    count++;
-                    haveAttack = true;
-                    clone[newX][newY] = 3;
-                    ImageView viewHatching = new ImageView(hatchCell);
-                    viewHatching.relocate(newX*Main.SQUARE_SIZE, newY*Main.SQUARE_SIZE);
-                    groupHighlight.getChildren().add(viewHatching);
+            for (int j = 1; j < 3; j++) {
+                boolean flag = false;
+                for (int g=1; g < 8; g++) {
+                    int newX = (int) (oldPlaceX + g * pow(-1, i));
+                    int newY = (int) (oldPlaceY + g * pow(-1, j));
+                    if (isOnBoard(newX, newY)) {
+                        if (clone[newX][newY] % 10 == player || flag && clone[newX][newY] != 0)
+                            break;
+                        if (flag) {
+                            count++;
+                            haveAttack = true;
+                            clone[newX][newY] = 3;
+                            ImageView viewHatching = new ImageView(hatchCell);
+                            viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                            groupHighlight.getChildren().add(viewHatching);
+                        }
+                        if (clone[newX][newY] % 10 == getOpponent(player) &&
+                                isOnBoard(newX + (int) (pow(-1, i)), newY + (int) (pow(-1, j))) &&
+                                clone[newX + (int) (pow(-1, i))][newY + (int) (pow(-1, j))] == 0) {
+                            flag = true;
+                        }
+                    } else break;
+                    if (clone[oldPlaceX][oldPlaceY] / 10 == 0 && g == 2) break;
                 }
             }
         }
@@ -222,16 +243,17 @@ public class MainController {
         viewContour.relocate(x*Main.SQUARE_SIZE, y*Main.SQUARE_SIZE);
         groupHighlight.getChildren().add(viewContour);
         for (int i=1; i<3; i++) {
-            int newX = (int) (x + pow(-1, i));
-            int newY;
-            if (player == 1) newY = y - 1;
-            else newY = y + 1;
-            if (isOnBoard(newX, newY) && clone[newX][newY]==0) {
-                haveCommonMoves = true;
-                clone[newX][newY] = 3;
-                ImageView viewHatching = new ImageView(hatchCell);
-                viewHatching.relocate(newX*Main.SQUARE_SIZE, newY*Main.SQUARE_SIZE);
-                groupHighlight.getChildren().add(viewHatching);
+            for (int g=1; g < 8; g++) {
+                int newX = (int) (oldPlaceX + g*pow(-1, i));
+                int newY = (int) (oldPlaceY + g*pow(-1, player));
+                if (isOnBoard(newX, newY) && clone[newX][newY] == 0) {
+                    haveCommonMoves = true;
+                    clone[newX][newY] = 3;
+                    ImageView viewHatching = new ImageView(hatchCell);
+                    viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    groupHighlight.getChildren().add(viewHatching);
+                } else break;
+                if (clone[oldPlaceX][oldPlaceY] / 10 == 0) break;
             }
         }
         return clone;

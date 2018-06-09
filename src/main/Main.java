@@ -21,7 +21,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         primaryStage.setTitle("Russian Checkers");
-        Parent root = FXMLLoader.load(getClass().getResource("/main/fxml/Desk.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/main/fxml/Board.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.show();
