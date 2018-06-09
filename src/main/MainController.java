@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.lang.Math.abs;
 import static java.lang.Math.pow;
 
 
@@ -207,9 +208,11 @@ public class MainController {
         for (int i=1; i<3; i++) {
             for (int j = 1; j < 3; j++) {
                 boolean flag = false;
-                for (int g=1; g < 8; g++) {
+                for (int g=1; g < 7; g++) {
                     int newX = (int) (oldPlaceX + g * pow(-1, i));
                     int newY = (int) (oldPlaceY + g * pow(-1, j));
+                    int newNextX = (int) (oldPlaceX + (g + 1) * pow(-1, i));
+                    int newNextY = (int) (oldPlaceY + (g + 1) * pow(-1, j));
                     if (isOnBoard(newX, newY)) {
                         if (clone[newX][newY] % 10 == player || flag && clone[newX][newY] != 0)
                             break;
@@ -221,10 +224,10 @@ public class MainController {
                             viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
                             groupHighlight.getChildren().add(viewHatching);
                         }
-                        if (clone[newX][newY] % 10 == getOpponent(player) &&
-                                isOnBoard(newX + (int) (pow(-1, i)), newY + (int) (pow(-1, j))) &&
-                                clone[newX + (int) (pow(-1, i))][newY + (int) (pow(-1, j))] == 0) {
+                        if (clone[newX][newY] % 10 == getOpponent(player)) {
+                            if (isOnBoard(newNextX, newNextY) && clone[newNextX][newNextY] == 0)
                             flag = true;
+                            else break;
                         }
                     } else break;
                     if (clone[oldPlaceX][oldPlaceY] / 10 == 0 && g == 2) break;
@@ -243,24 +246,38 @@ public class MainController {
         viewContour.relocate(x*Main.SQUARE_SIZE, y*Main.SQUARE_SIZE);
         groupHighlight.getChildren().add(viewContour);
         for (int i=1; i<3; i++) {
-            for (int g=1; g < 8; g++) {
-                int newX = (int) (oldPlaceX + g*pow(-1, i));
-                int newY = (int) (oldPlaceY + g*pow(-1, player));
+            if (clone[oldPlaceX][oldPlaceY] / 10 == 0){
+                int newX = (int) (oldPlaceX + pow(-1, i));
+                int newY = (int) (oldPlaceY + pow(-1, player));
                 if (isOnBoard(newX, newY) && clone[newX][newY] == 0) {
                     haveCommonMoves = true;
                     clone[newX][newY] = 3;
                     ImageView viewHatching = new ImageView(hatchCell);
                     viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
                     groupHighlight.getChildren().add(viewHatching);
-                } else break;
-                if (clone[oldPlaceX][oldPlaceY] / 10 == 0) break;
+                }
+            } else {
+                for (int j=1; j<3; j++) {
+                    for (int g = 1; g < 8; g++) {
+                        int newX = (int) (oldPlaceX + g * pow(-1, i));
+                        int newY = (int) (oldPlaceY + g * pow(-1, j));
+                        if (isOnBoard(newX, newY) && clone[newX][newY] == 0) {
+                            haveCommonMoves = true;
+                            clone[newX][newY] = 3;
+                            ImageView viewHatching = new ImageView(hatchCell);
+                            viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                            groupHighlight.getChildren().add(viewHatching);
+                        } else break;
+                        if (clone[oldPlaceX][oldPlaceY] / 10 == 0) break;
+                    }
+                }
             }
         }
         return clone;
     }
 
     private void commonMoves(int newX, int newY) {
-        board[newX][newY] = player;
+        board[newX][newY] = board[oldPlaceX][oldPlaceY];
         board[oldPlaceX][oldPlaceY] = 0;
         for (int i=0; i<8; i++) {
             for (int j=0; j<8; j++) {
@@ -273,17 +290,34 @@ public class MainController {
             if (oldPlaceX == element.getValue().getKey() &&
                     oldPlaceY == element.getValue().getValue()) {
                 gamePanel.getChildren().remove(element.getKey());
-                element.getKey().relocate(newX*Main.SQUARE_SIZE, newY*Main.SQUARE_SIZE);
-                gamePanel.getChildren().add(element.getKey());
-                link.remove(element);
-                link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
+                if ((newY == 0 || newY == 7) && board[newX][newY] / 10 == 0) {
+                    link.remove(element);
+                    Image imageQueen;
+                    ImageView viewQueen;
+                    if (newY == 0) {
+                        board[newX][newY] = 11;
+                        imageQueen = new Image("main/fxml/WhiteQueen80.png");
+                    } else {
+                        board[newX][newY] = 22;
+                        imageQueen = new Image("main/fxml/BlackQueen80.png");
+                    }
+                    viewQueen = new ImageView(imageQueen);
+                    viewQueen.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    gamePanel.getChildren().add(viewQueen);
+                    link.add(new Pair<>(viewQueen, new Pair<>(newX, newY)));
+                } else {
+                    element.getKey().relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    gamePanel.getChildren().add(element.getKey());
+                    link.remove(element);
+                    link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
+                }
                 break;
             }
         }
     }
 
     private void attackMoves(int newX, int newY) {
-        board[newX][newY] = player;
+        board[newX][newY] = board[oldPlaceX][oldPlaceY];
         board[oldPlaceX][oldPlaceY] = 0;
         for (int i=0; i<8; i++) {
             for (int j=0; j<8; j++) {
@@ -296,25 +330,48 @@ public class MainController {
             if (oldPlaceX == element.getValue().getKey() &&
                     oldPlaceY == element.getValue().getValue()) {
                 gamePanel.getChildren().remove(element.getKey());
-                element.getKey().relocate(newX*Main.SQUARE_SIZE, newY*Main.SQUARE_SIZE);
-                gamePanel.getChildren().add(element.getKey());
-                link.remove(element);
-                link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
+                if ((newY == 0 || newY == 7) && board[newX][newY] / 10 == 0) {
+                    link.remove(element);
+                    Image imageQueen;
+                    ImageView viewQueen;
+                    if (newY == 0) {
+                        board[newX][newY] = 11;
+                        imageQueen = new Image("main/fxml/WhiteQueen80.png");
+                    } else {
+                        board[newX][newY] = 22;
+                        imageQueen = new Image("main/fxml/BlackQueen80.png");
+                    }
+                    viewQueen = new ImageView(imageQueen);
+                    viewQueen.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    gamePanel.getChildren().add(viewQueen);
+                    link.add(new Pair<>(viewQueen, new Pair<>(newX, newY)));
+                } else {
+                    element.getKey().relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    gamePanel.getChildren().add(element.getKey());
+                    link.remove(element);
+                    link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
+                }
                 break;
             }
         }
-        int deadX = (newX + oldPlaceX)/2;
-        int deadY = (newY + oldPlaceY)/2;
-        board[deadX][deadY] = 0;
-        for (Pair<ImageView, Pair<Integer, Integer>> element: link){
-            if (deadX == element.getValue().getKey() &&
-                    deadY == element.getValue().getValue()) {
-                gamePanel.getChildren().remove(element.getKey());
-                link.remove(element);
+        int directionX = (newX - oldPlaceX) / abs(newX - oldPlaceX);
+        int directionY = (newY - oldPlaceY) / abs(newY - oldPlaceY);
+        for (;;) {
+            if (board[oldPlaceX + directionX][oldPlaceY + directionY] % 10 == getOpponent(player)){
+                for (Pair<ImageView, Pair<Integer, Integer>> element: link){
+                    if (oldPlaceX + directionX == element.getValue().getKey() &&
+                            oldPlaceY + directionY == element.getValue().getValue()) {
+                        board[oldPlaceX + directionX][oldPlaceY + directionY] = 0;
+                        gamePanel.getChildren().remove(element.getKey());
+                        link.remove(element);
+                        break;
+                    }
+                }
                 break;
             }
+            directionX += directionX;
+            directionY += directionY;
         }
-
     }
 
     private void turnPlayer() {
