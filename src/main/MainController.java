@@ -1,9 +1,7 @@
 package main;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
@@ -12,9 +10,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,6 +63,7 @@ public class MainController {
     private Group groupHighlight = new Group();
     private final int HEIGHT = 8;
     private final int WIDTH = 8;
+    private final double SQUARE_SIZE = 80.0;
     private static List<Pair<ImageView, Pair<Integer, Integer>>> link;
     private Image contour = new Image("main/fxml/Contour.png");
     private Image hatchCell = new Image("main/fxml/Hatching.png");
@@ -210,8 +207,8 @@ public class MainController {
             setBoard(new int[8][8]);
             setLink(new ArrayList<>());
         }
-        int x = (int) (mouseEvent.getX()/Main.SQUARE_SIZE);
-        int y = (int) (mouseEvent.getY()/Main.SQUARE_SIZE);
+        int x = (int) (mouseEvent.getX()/SQUARE_SIZE);
+        int y = (int) (mouseEvent.getY()/SQUARE_SIZE);
         highlightAndPossibleMoves(x, y);
     }
 
@@ -233,7 +230,7 @@ public class MainController {
                     boardCopy = clone;
                 } else {
                     ImageView viewContour = new ImageView(contour);
-                    viewContour.relocate(x * Main.SQUARE_SIZE, y * Main.SQUARE_SIZE);
+                    viewContour.relocate(x * SQUARE_SIZE, y * SQUARE_SIZE);
                     groupHighlight.getChildren().add(viewContour);
                     gamePanel.getChildren().add(groupHighlight);
                 }
@@ -268,7 +265,7 @@ public class MainController {
         oldPlaceX = x;
         oldPlaceY = y;
         ImageView viewContour = new ImageView(contour);
-        viewContour.relocate(x*Main.SQUARE_SIZE, y*Main.SQUARE_SIZE);
+        viewContour.relocate(x*SQUARE_SIZE, y*SQUARE_SIZE);
         groupHighlight.getChildren().add(viewContour);
         int count = 0;
         for (int i=1; i<3; i++) {
@@ -287,7 +284,7 @@ public class MainController {
                             haveAttack = true;
                             clone[newX][newY] = 3;
                             ImageView viewHatching = new ImageView(hatchCell);
-                            viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                            viewHatching.relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                             groupHighlight.getChildren().add(viewHatching);
                         }
                         if (clone[newX][newY] % 10 == getOpponent(player)) {
@@ -309,7 +306,7 @@ public class MainController {
         oldPlaceY = y;
         haveCommonMoves = false;
         ImageView viewContour = new ImageView(contour);
-        viewContour.relocate(x*Main.SQUARE_SIZE, y*Main.SQUARE_SIZE);
+        viewContour.relocate(x*SQUARE_SIZE, y*SQUARE_SIZE);
         groupHighlight.getChildren().add(viewContour);
         for (int i=1; i<3; i++) {
             if (clone[oldPlaceX][oldPlaceY] / 10 == 0){
@@ -319,7 +316,7 @@ public class MainController {
                     haveCommonMoves = true;
                     clone[newX][newY] = 3;
                     ImageView viewHatching = new ImageView(hatchCell);
-                    viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    viewHatching.relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                     groupHighlight.getChildren().add(viewHatching);
                 }
             } else {
@@ -331,7 +328,7 @@ public class MainController {
                             haveCommonMoves = true;
                             clone[newX][newY] = 3;
                             ImageView viewHatching = new ImageView(hatchCell);
-                            viewHatching.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                            viewHatching.relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                             groupHighlight.getChildren().add(viewHatching);
                         } else break;
                         if (clone[oldPlaceX][oldPlaceY] / 10 == 0) break;
@@ -368,11 +365,11 @@ public class MainController {
                         imageQueen = new Image("main/fxml/BlackQueen80.png");
                     }
                     viewQueen = new ImageView(imageQueen);
-                    viewQueen.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    viewQueen.relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                     gamePanel.getChildren().add(viewQueen);
                     link.add(new Pair<>(viewQueen, new Pair<>(newX, newY)));
                 } else {
-                    element.getKey().relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    element.getKey().relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                     gamePanel.getChildren().add(element.getKey());
                     link.remove(element);
                     link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
@@ -408,11 +405,11 @@ public class MainController {
                         imageQueen = new Image("main/fxml/BlackQueen80.png");
                     }
                     viewQueen = new ImageView(imageQueen);
-                    viewQueen.relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    viewQueen.relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                     gamePanel.getChildren().add(viewQueen);
                     link.add(new Pair<>(viewQueen, new Pair<>(newX, newY)));
                 } else {
-                    element.getKey().relocate(newX * Main.SQUARE_SIZE, newY * Main.SQUARE_SIZE);
+                    element.getKey().relocate(newX * SQUARE_SIZE, newY * SQUARE_SIZE);
                     gamePanel.getChildren().add(element.getKey());
                     link.remove(element);
                     link.add(new Pair<>(element.getKey(), new Pair<>(newX, newY)));
