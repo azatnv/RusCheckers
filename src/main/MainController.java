@@ -50,8 +50,8 @@ public class MainController {
 
     public ImageView turnImage;
     public Text txtScore;
-    public int whiteScore = 0;
-    public int blackScore = 0;
+    private int whiteScore = 0;
+    private int blackScore = 0;
 
     public Pane gamePanel;
 
@@ -118,11 +118,35 @@ public class MainController {
     private int[][] cloneBoard(int [][] mainBoard) {
         int[][] boardCopy = new int[8][8];
         for (int i=0; i<8; i++) {
-            for (int j=0; j<8; j++) {
-                boardCopy[i][j] = mainBoard[i][j];
-            }
+            System.arraycopy(mainBoard[i], 0, boardCopy[i], 0, 8);
         }
         return boardCopy;
+    }
+
+    private void winWhite(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Конец игры");
+        alert.setHeaderText("Исход игры: победа БЕЛЫХ!\nИграть снова?");
+        ButtonType play = new ButtonType("Играть");
+        ButtonType exit = new ButtonType("Выход");
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(play, exit);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == play) btnRestart(actionEvent);
+        else System.exit(100000);
+    }
+
+    private void winBlack(ActionEvent actionEvent) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Конец игры");
+        alert.setHeaderText("Исход игры: победа ЧЕРНЫХ!\nИграть снова?");
+        ButtonType play = new ButtonType("Играть");
+        ButtonType exit = new ButtonType("Выход");
+        alert.getButtonTypes().clear();
+        alert.getButtonTypes().addAll(play, exit);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == play) btnRestart(actionEvent);
+        else System.exit(100000);
     }
 
     public void showDraw(ActionEvent actionEvent) {
@@ -156,18 +180,9 @@ public class MainController {
 
     public void showLose(ActionEvent actionEvent) {
         if (count > 0) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Конец игры");
             if (player == 2)
-                alert.setHeaderText("Исход игры: победа БЕЛЫХ!\nИграть снова?");
-            else alert.setHeaderText("Исход игры: победа ЧЕРНЫХ!\nИграть снова?");
-            ButtonType play = new ButtonType("Играть");
-            ButtonType exit = new ButtonType("Выход");
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().addAll(play, exit);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == play) btnRestart(actionEvent);
-            else System.exit(100000);
+               winWhite(actionEvent);
+            else winBlack(actionEvent);
         }
     }
 
@@ -420,8 +435,8 @@ public class MainController {
                 }
                 break;
             }
-            directionX += directionX;
-            directionY += directionY;
+            directionX += directionX / abs(directionX);
+            directionY += directionY/ abs(directionY);
         }
         if (player == 1) {
             blackScore++;
@@ -430,6 +445,8 @@ public class MainController {
             whiteScore++;
             txtScore.setText(whiteScore + "-" + blackScore);
         }
+        if (blackScore == 12) winWhite(new ActionEvent());
+        else if (whiteScore == 12) winBlack(new ActionEvent());
     }
 
     private void turnPlayer() {
