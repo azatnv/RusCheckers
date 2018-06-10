@@ -4,15 +4,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
@@ -43,6 +47,11 @@ public class MainController {
     public ImageView w10;
     public ImageView w11;
     public ImageView w12;
+
+    public ImageView turnImage;
+    public Text txtScore;
+    public int whiteScore = 0;
+    public int blackScore = 0;
 
     public Pane gamePanel;
 
@@ -117,11 +126,49 @@ public class MainController {
     }
 
     public void showDraw(ActionEvent actionEvent) {
-
+        if (count > 0) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Ничья?");
+            if (player == 1)
+                alert.setHeaderText("Белые предложили Ничью");
+            else alert.setHeaderText("Черные предложили Ничью");
+            ButtonType ok = new ButtonType("Принять");
+            ButtonType cancel = new ButtonType("Отклонить");
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(ok, cancel);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == cancel) alert.close();
+            else {
+                alert.close();
+                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Ничья");
+                alert.setHeaderText("Исход игры: НИЧЬЯ\nИграть снова?");
+                ButtonType play = new ButtonType("Играть");
+                ButtonType exit = new ButtonType("Выход");
+                alert.getButtonTypes().clear();
+                alert.getButtonTypes().addAll(play, exit);
+                Optional<ButtonType> result2 = alert.showAndWait();
+                if (result2.get() == play) btnRestart(actionEvent);
+                else System.exit(100000);
+            }
+        }
     }
 
     public void showLose(ActionEvent actionEvent) {
-
+        if (count > 0) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Конец игры");
+            if (player == 2)
+                alert.setHeaderText("Исход игры: победа БЕЛЫХ!\nИграть снова?");
+            else alert.setHeaderText("Исход игры: победа ЧЕРНЫХ!\nИграть снова?");
+            ButtonType play = new ButtonType("Играть");
+            ButtonType exit = new ButtonType("Выход");
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(play, exit);
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == play) btnRestart(actionEvent);
+            else System.exit(100000);
+        }
     }
 
     public void btnRestart(ActionEvent actionEvent) {
@@ -136,6 +183,10 @@ public class MainController {
             pair.getKey().relocate(pair.getValue().getKey()*80, pair.getValue().getValue()*80);
             gamePanel.getChildren().add(pair.getKey());
         }
+        turnImage.setImage(new Image("main/fxml/White20.png"));
+        whiteScore = 0;
+        blackScore = 0;
+        txtScore.setText(whiteScore + "-" + blackScore);
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
@@ -372,11 +423,24 @@ public class MainController {
             directionX += directionX;
             directionY += directionY;
         }
+        if (player == 1) {
+            blackScore++;
+            txtScore.setText(whiteScore + "-" + blackScore);
+        } else {
+            whiteScore++;
+            txtScore.setText(whiteScore + "-" + blackScore);
+        }
     }
 
     private void turnPlayer() {
-        if (player == 1) player = 2;
-        else player = 1;
+        if (player == 1) {
+            player = 2;
+            turnImage.setImage(new Image("main/fxml/Black20.png"));
+        }
+        else {
+            player = 1;
+            turnImage.setImage(new Image("main/fxml/White20.png"));
+        }
     }
 
     private int getOpponent(int player) {

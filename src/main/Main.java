@@ -13,16 +13,14 @@ import java.util.List;
 
 public class Main extends Application {
 
-    private static Group newCheckers = new Group();
     final static double SQUARE_SIZE = 80.0;
-    private List<Pair<Integer,Integer>> directions;
-
 
     @Override
     public void start(Stage primaryStage) throws Exception{
         primaryStage.setTitle("Russian Checkers");
         Parent root = FXMLLoader.load(getClass().getResource("/main/fxml/Board.fxml"));
         Scene scene = new Scene(root);
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
