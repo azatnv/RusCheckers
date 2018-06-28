@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
@@ -11,272 +9,290 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="640.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="main.MainController">
-  <children>
-    <Pane id="gamePane" fx:id="gamePanel" maxHeight="640.0" maxWidth="640.0" minHeight="640.0" minWidth="640.0" onMouseClicked="#onMouseClicked" prefHeight="640.0" prefWidth="640.0" style="" AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <children>
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" height="80.0" layoutX="80.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0">
-          <fill>
-            <Color blue="0.000" green="0.216" red="0.447" fx:id="x1" />
-          </fill>
-        </Rectangle>
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="0.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="0.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="80.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="0.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="160.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="0.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="240.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="0.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="320.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="0.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="400.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="0.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="480.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="0.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="560.0" stroke="BLACK" strokeType="INSIDE" width="80.0" />
-        <ImageView id="Black80.png" fx:id="b1" layoutX="80.0" layoutY="0.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w1" layoutX="0.0" layoutY="400.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b5" layoutX="0.0" layoutY="80.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b9" layoutX="80.0" layoutY="160.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b6" layoutX="160.0" layoutY="80.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b2" layoutX="240.0" layoutY="0.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b10" layoutX="240.0" layoutY="160.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b7" layoutX="320.0" layoutY="80.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b3" layoutX="400.0" layoutY="0.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b11" layoutX="400.0" layoutY="160.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b8" layoutX="480.0" layoutY="80.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b4" layoutX="560.0" layoutY="0.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="Black80.png" fx:id="b12" layoutX="560.0" layoutY="160.0">
-          <image>
-            <Image url="@Black80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w5" layoutX="80.0" layoutY="480.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w9" layoutX="0.0" layoutY="560.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w2" layoutX="160.0" layoutY="400.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w10" layoutX="160.0" layoutY="560.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w6" layoutX="240.0" layoutY="480.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w3" layoutX="320.0" layoutY="400.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w7" layoutX="400.0" layoutY="480.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w11" layoutX="320.0" layoutY="560.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w12" layoutX="480.0" layoutY="560.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w8" layoutX="560.0" layoutY="480.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-        <ImageView id="White80.png" fx:id="w4" layoutX="480.0" layoutY="400.0">
-          <image>
-            <Image url="@White80.png" preserveRatio="true" smooth="true" />
-          </image>
-        </ImageView>
-      </children>
-      <effect>
-        <Lighting diffuseConstant="1.2857142857142858" specularConstant="0.22063492063492063" specularExponent="19.047619047619047" surfaceScale="2.5396825396825395">
-          <bumpInput>
-            <Shadow />
-          </bumpInput>
-          <light>
-            <javafx.scene.effect.Light.Distant color="#ffffbb" />
-          </light>
-        </Lighting>
-      </effect>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="720.0" prefWidth="640.0" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/2.2" fx:controller="main.MainController">
+  <Pane id="gamePane" fx:id="gamePanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+        minWidth="-Infinity" onMouseClicked="#onMouseClicked" prefHeight="640.0" prefWidth="640.0"
+        AnchorPane.bottomAnchor="80.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        AnchorPane.topAnchor="0.0">
+    <effect>
+      <Lighting diffuseConstant="1.2857142857142858" specularConstant="0.22063492063492063"
+                specularExponent="19.047619047619047" surfaceScale="2.5396825396825395">
+        <bumpInput>
+          <Shadow/>
+        </bumpInput>
+        <light>
+          <javafx.scene.effect.Light.Distant color="#ffffbb"/>
+        </light>
+      </Lighting>
+    </effect>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" stroke="BLACK" strokeType="INSIDE"
+               width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" height="80.0" layoutX="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0">
+      <fill>
+        <Color green="0.216" red="0.447" fx:id="x1"/>
+      </fill>
+    </Rectangle>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="80.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutY="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="160.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="160.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="160.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="160.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutY="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="240.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="240.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="240.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="240.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutY="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="320.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="320.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="320.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="320.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0"  layoutY="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="400.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="400.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="400.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="400.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutY="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="80.0" layoutY="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="160.0" layoutY="480.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="240.0" layoutY="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="320.0" layoutY="480.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="400.0" layoutY="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="480.0" layoutY="480.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="560.0" layoutY="480.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutY="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="80.0" layoutY="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="160.0" layoutY="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="240.0" layoutY="560.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="320.0" layoutY="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="400.0" layoutY="560.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="$x1" height="80.0" layoutX="480.0" layoutY="560.0" stroke="BLACK"
+               strokeType="INSIDE" width="80.0"/>
+    <Rectangle arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="80.0" layoutX="560.0" layoutY="560.0"
+               stroke="BLACK" strokeType="INSIDE" width="80.0"/>
+    <ImageView id="Black80.png" fx:id="b1" layoutX="80.0">
+      <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w1" layoutY="400.0">
+      <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b5" layoutY="80.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b9" layoutX="80.0" layoutY="160.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b6" layoutX="160.0" layoutY="80.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b2" layoutX="240.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b10" layoutX="240.0" layoutY="160.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b7" layoutX="320.0" layoutY="80.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b3" layoutX="400.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b11" layoutX="400.0" layoutY="160.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b8" layoutX="480.0" layoutY="80.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b4" layoutX="560.0" >
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="Black80.png" fx:id="b12" layoutX="560.0" layoutY="160.0">
+        <Image url="@Black80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w5" layoutX="80.0" layoutY="480.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w9" layoutY="560.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w2" layoutX="160.0" layoutY="400.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w10" layoutX="160.0" layoutY="560.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w6" layoutX="240.0" layoutY="480.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w3" layoutX="320.0" layoutY="400.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w7" layoutX="400.0" layoutY="480.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w11" layoutX="320.0" layoutY="560.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w12" layoutX="480.0" layoutY="560.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w8" layoutX="560.0" layoutY="480.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+    <ImageView id="White80.png" fx:id="w4" layoutX="480.0" layoutY="400.0">
+        <Image url="@White80.png" preserveRatio="true" smooth="true"/>
+    </ImageView>
+  </Pane>
+  <HBox id="hbox" maxHeight="-Infinity"
+        maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="80.0" prefWidth="640.0"
+        style="-fx-background-color: #59351F" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+        AnchorPane.rightAnchor="0.0">
+    <effect>
+      <InnerShadow/>
+    </effect>
+    <Pane prefHeight="80.0" prefWidth="120.0">
+      <Text id="txtRound" layoutX="14.0" layoutY="29.0" scaleX="1.2044250770659721" scaleY="1.1117537757129914"
+            strokeType="OUTSIDE" strokeWidth="0.0" text="Ход:">
+        <fill>
+          <Color blue="0.400" green="0.686" red="1.000" fx:id="x4"/>
+        </fill>
+      </Text>
+      <Button id="btnRestart" layoutX="10.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnRestart"
+              prefWidth="100.0" text="RESTART">
+        <font>
+          <Font name="Georgia Bold" size="12.0"/>
+        </font>
+      </Button>
+      <ImageView id="White20.png" fx:id="turnImage" fitHeight="30.0" fitWidth="30.0" layoutX="45.0" layoutY="10.0">
+          <Image url="@White20.png" preserveRatio="true" smooth="true"/>
+      </ImageView>
     </Pane>
-    <HBox id="hbox" fx:id="menuPanel" disable="false" fillHeight="true" focusTraversable="false" maxHeight="80.0" maxWidth="640.0" minHeight="79.9998779296875" minWidth="640.0" prefHeight="79.9998779296875" prefWidth="640.0" style="-fx-background-color: #59351F" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
-      <children>
-        <Pane prefHeight="80.0" prefWidth="120.0">
-          <children>
-            <Text id="txtRound" layoutX="14.0" layoutY="29.0" scaleX="1.2044250770659721" scaleY="1.1117537757129914" strokeType="OUTSIDE" strokeWidth="0.0" text="Ход:" textAlignment="LEFT">
-              <fill>
-                <Color blue="0.400" green="0.686" red="1.000" fx:id="x4" />
-              </fill>
-            </Text>
-            <Button id="btnRestart" layoutX="10.0" layoutY="47.0" mnemonicParsing="false" onAction="#btnRestart" prefWidth="100.0" text="RESTART">
-              <font>
-                <Font name="Georgia Bold" size="12.0" />
-              </font>
-            </Button>
-            <ImageView id="White20.png" fx:id="turnImage" fitHeight="30.0" fitWidth="30.0" layoutX="45.0" layoutY="10.0">
-              <image>
-                <Image url="@White20.png" preserveRatio="true" smooth="true" />
-              </image>
-            </ImageView>
-          </children>
-        </Pane>
-        <Button id="btn" cancelButton="false" defaultButton="false" mnemonicParsing="false" onAction="#showDraw" prefHeight="35.0" style="-fx-background-color: #C1876B" text="Предложить ничью" textAlignment="CENTER" textFill="BLACK" textOverrun="ELLIPSIS">
-          <effect>
-            <ColorAdjust brightness="0.15267175572519065" hue="-0.03053435114503822" saturation="-0.5196335877862595" />
-          </effect>
-          <font>
-            <Font name="Georgia" size="14.0" fx:id="x2" />
-          </font>
-          <HBox.margin>
-            <Insets bottom="25.0" left="10.0" right="10.0" top="25.0" fx:id="x3" />
-          </HBox.margin>
-        </Button>
-        <Button id="btn" cancelButton="false" defaultButton="false" font="$x2" mnemonicParsing="false" onAction="#showLose" prefHeight="35.0" prefWidth="129.0" style="-fx-background-color: #C1876B" text="Сдаться" textAlignment="CENTER" textFill="BLACK" wrapText="false" HBox.margin="$x3">
-          <effect>
-            <ColorAdjust brightness="0.15267175572519065" hue="-0.030435114503815" saturation="-0.5190839694656489" />
-          </effect>
-        </Button>
-        <ImageView id="White20.png" fitHeight="30.0" fitWidth="30.0">
-          <image>
-            <Image url="@White20.png" preserveRatio="true" smooth="true" />
-          </image>
-          <HBox.margin>
-            <Insets left="12.0" right="10.0" top="25.0" />
-          </HBox.margin>
-        </ImageView>
-        <Text id="btnScore" fx:id="txtScore" fill="#ffaf66" scaleX="3.203088430878884" scaleY="2.623216041201296" strokeType="OUTSIDE" strokeWidth="0.0" text="0-0">
-          <HBox.margin>
-            <Insets left="15.0" right="15.0" top="30.0" />
-          </HBox.margin>
-        </Text>
-        <ImageView id="Black20.png" fitHeight="30.0" fitWidth="30.0">
-          <image>
-            <Image url="@Black20.png" preserveRatio="true" smooth="true" />
-          </image>
-          <HBox.margin>
-            <Insets left="10.0" top="25.0" />
-          </HBox.margin>
-        </ImageView>
-      </children>
+    <Button id="btn" mnemonicParsing="false" onAction="#showDraw"
+            prefHeight="35.0" style="-fx-background-color: #C1876B" text="Предложить ничью" textAlignment="CENTER"
+            textFill="BLACK" >
       <effect>
-        <InnerShadow />
+        <ColorAdjust brightness="0.15267175572519065" hue="-0.03053435114503822" saturation="-0.5196335877862595"/>
       </effect>
-    </HBox>
-  </children>
+      <font>
+        <Font name="Georgia" size="14.0" fx:id="x2"/>
+      </font>
+      <HBox.margin>
+        <Insets bottom="25.0" left="10.0" right="10.0" top="25.0" fx:id="x3"/>
+      </HBox.margin>
+    </Button>
+    <Button id="btn" font="$x2" mnemonicParsing="false"
+            onAction="#showLose" prefHeight="35.0" prefWidth="129.0" style="-fx-background-color: #C1876B"
+            text="Сдаться" textAlignment="CENTER" textFill="BLACK" HBox.margin="$x3">
+      <effect>
+        <ColorAdjust brightness="0.15267175572519065" hue="-0.030435114503815" saturation="-0.5190839694656489"/>
+      </effect>
+    </Button>
+    <ImageView id="White20.png" fitHeight="30.0" fitWidth="30.0">
+        <Image url="@White20.png" preserveRatio="true" smooth="true"/>
+      <HBox.margin>
+        <Insets left="12.0" right="10.0" top="25.0"/>
+      </HBox.margin>
+    </ImageView>
+    <Text id="btnScore" fx:id="txtScore" fill="#ffaf66" scaleX="3.203088430878884" scaleY="2.623216041201296"
+          strokeType="OUTSIDE" strokeWidth="0.0" text="0-0">
+      <HBox.margin>
+        <Insets left="15.0" right="15.0" top="30.0"/>
+      </HBox.margin>
+    </Text>
+    <ImageView id="Black20.png" fitHeight="30.0" fitWidth="30.0">
+        <Image url="@Black20.png" preserveRatio="true" smooth="true"/>
+      <HBox.margin>
+        <Insets left="10.0" top="25.0"/>
+      </HBox.margin>
+    </ImageView>
+  </HBox>
 </AnchorPane>

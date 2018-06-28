@@ -223,6 +223,11 @@ public class MainController {
                 if (haveAttack) {
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
+                } else {
+                    ImageView viewContour = new ImageView(contour);
+                    viewContour.relocate(x * SQUARE_SIZE, y * SQUARE_SIZE);
+                    groupHighlight.getChildren().add(viewContour);
+                    gamePanel.getChildren().add(groupHighlight);
                 }
             }
             if (getPlayerByEnum(board[x][y]) == player && !haveOneAttack) {
