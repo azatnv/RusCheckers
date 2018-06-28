@@ -1,6 +1,5 @@
 package main;
 
-import javafx.event.ActionEvent;
 import javafx.scene.Group;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -43,7 +42,7 @@ public class MainController {
     public ImageView w10;
     public ImageView w11;
     public ImageView w12;
-
+    
     public ImageView turnImage;
     public Text txtScore;
     private int whiteScore = 0;
@@ -52,64 +51,64 @@ public class MainController {
     public Pane gamePanel;
 
     private int count = 0;
-    private static boolean againAttack = false;
-    private static int oldPlaceX;
-    private static int oldPlaceY;
-    private static boolean haveAttack;
-    private static boolean haveCommonMoves;
-    private static Integer player = 1;
-    private static int[][] board = new int[8][8]; //[X][Y]
-    private static int[][] boardCopy = new int[8][8]; //[X][Y]
+    private boolean againAttack = false;
+    private int oldPlaceX;
+    private int oldPlaceY;
+    private boolean haveAttack;
+    private boolean haveCommonMoves;
+    private Integer player = 1;
+    private int[][] board = new int[8][8]; //[X][Y]
+    private int[][] boardCopy = new int[8][8]; //[X][Y]
     private Group groupHighlight = new Group();
     private final int HEIGHT = 8;
     private final int WIDTH = 8;
     private final double SQUARE_SIZE = 80.0;
-    private static List<Pair<ImageView, Pair<Integer, Integer>>> link;
+    private List<Pair<ImageView, Pair<Integer, Integer>>> link;
     private Image contour = new Image("main/fxml/Contour.png");
     private Image hatchCell = new Image("main/fxml/Hatching.png");
 
-    private void setLink(List<Pair<ImageView, Pair<Integer, Integer>>> link) {
-        link.add(new Pair<>(b1, new Pair<>(1, 0)));
-        link.add(new Pair<>(b2, new Pair<>(3, 0)));
-        link.add(new Pair<>(b3, new Pair<>(5, 0)));
-        link.add(new Pair<>(b4, new Pair<>(7, 0)));
-        link.add(new Pair<>(b5, new Pair<>(0, 1)));
-        link.add(new Pair<>(b6, new Pair<>(2, 1)));
-        link.add(new Pair<>(b7, new Pair<>(4, 1)));
-        link.add(new Pair<>(b8, new Pair<>(6, 1)));
-        link.add(new Pair<>(b9, new Pair<>(1, 2)));
-        link.add(new Pair<>(b10, new Pair<>(3, 2)));
-        link.add(new Pair<>(b11, new Pair<>(5, 2)));
-        link.add(new Pair<>(b12, new Pair<>(7, 2)));
-        link.add(new Pair<>(w1, new Pair<>(0, 5)));
-        link.add(new Pair<>(w2, new Pair<>(2, 5)));
-        link.add(new Pair<>(w3, new Pair<>(4, 5)));
-        link.add(new Pair<>(w4, new Pair<>(6, 5)));
-        link.add(new Pair<>(w5, new Pair<>(1, 6)));
-        link.add(new Pair<>(w6, new Pair<>(3, 6)));
-        link.add(new Pair<>(w7, new Pair<>(5, 6)));
-        link.add(new Pair<>(w8, new Pair<>(7, 6)));
-        link.add(new Pair<>(w9, new Pair<>(0, 7)));
-        link.add(new Pair<>(w10, new Pair<>(2, 7)));
-        link.add(new Pair<>(w11, new Pair<>(4, 7)));
-        link.add(new Pair<>(w12, new Pair<>(6, 7)));
-        MainController.link = link;
+    private void setLink(List<Pair<ImageView, Pair<Integer, Integer>>> list) {
+        list.add(new Pair<>(b1, new Pair<>(1, 0)));
+        list.add(new Pair<>(b2, new Pair<>(3, 0)));
+        list.add(new Pair<>(b3, new Pair<>(5, 0)));
+        list.add(new Pair<>(b4, new Pair<>(7, 0)));
+        list.add(new Pair<>(b5, new Pair<>(0, 1)));
+        list.add(new Pair<>(b6, new Pair<>(2, 1)));
+        list.add(new Pair<>(b7, new Pair<>(4, 1)));
+        list.add(new Pair<>(b8, new Pair<>(6, 1)));
+        list.add(new Pair<>(b9, new Pair<>(1, 2)));
+        list.add(new Pair<>(b10, new Pair<>(3, 2)));
+        list.add(new Pair<>(b11, new Pair<>(5, 2)));
+        list.add(new Pair<>(b12, new Pair<>(7, 2)));
+        list.add(new Pair<>(w1, new Pair<>(0, 5)));
+        list.add(new Pair<>(w2, new Pair<>(2, 5)));
+        list.add(new Pair<>(w3, new Pair<>(4, 5)));
+        list.add(new Pair<>(w4, new Pair<>(6, 5)));
+        list.add(new Pair<>(w5, new Pair<>(1, 6)));
+        list.add(new Pair<>(w6, new Pair<>(3, 6)));
+        list.add(new Pair<>(w7, new Pair<>(5, 6)));
+        list.add(new Pair<>(w8, new Pair<>(7, 6)));
+        list.add(new Pair<>(w9, new Pair<>(0, 7)));
+        list.add(new Pair<>(w10, new Pair<>(2, 7)));
+        list.add(new Pair<>(w11, new Pair<>(4, 7)));
+        list.add(new Pair<>(w12, new Pair<>(6, 7)));
+        link = list;
     }
 
-    private void setBoard(int[][] board) {
+    private void setBoard(int[][] b) {
         for (int x=0; x<8; x++) {
             for (int y=0; y<3; y++) {
-                if ((x+y)%2==1) board[x][y]=2;
-                else board[x][y]=0;
+                if ((x+y)%2==1) b[x][y]=2;
+                else b[x][y]=0;
             }
         }
         for (int x=0; x<8; x++) {
             for (int y=5; y<8; y++) {
-                if ((x+y)%2==1) board[x][y]=1;
-                else board[x][y]=0;
+                if ((x+y)%2==1) b[x][y]=1;
+                else b[x][y]=0;
             }
         }
-        MainController.board = board;
+        board = b;
     }
 
     private int[][] cloneBoard(int [][] mainBoard) {
@@ -120,7 +119,7 @@ public class MainController {
         return boardCopy;
     }
 
-    private void winWhite(ActionEvent actionEvent) {
+    private void winWhite() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Конец игры");
         alert.setHeaderText("Исход игры: победа БЕЛЫХ!\nИграть снова?");
@@ -129,11 +128,11 @@ public class MainController {
         alert.getButtonTypes().clear();
         alert.getButtonTypes().addAll(play, exit);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == play) btnRestart(actionEvent);
+        if (result.get() == play) btnRestart();
         else System.exit(100000);
     }
 
-    private void winBlack(ActionEvent actionEvent) {
+    private void winBlack() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Конец игры");
         alert.setHeaderText("Исход игры: победа ЧЕРНЫХ!\nИграть снова?");
@@ -142,11 +141,11 @@ public class MainController {
         alert.getButtonTypes().clear();
         alert.getButtonTypes().addAll(play, exit);
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == play) btnRestart(actionEvent);
+        if (result.get() == play) btnRestart();
         else System.exit(100000);
     }
 
-    public void showDraw(ActionEvent actionEvent) {
+    public void showDraw() {
         if (count > 0) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setTitle("Ничья?");
@@ -169,21 +168,21 @@ public class MainController {
                 alert.getButtonTypes().clear();
                 alert.getButtonTypes().addAll(play, exit);
                 Optional<ButtonType> result2 = alert.showAndWait();
-                if (result2.get() == play) btnRestart(actionEvent);
+                if (result2.get() == play) btnRestart();
                 else System.exit(100000);
             }
         }
     }
 
-    public void showLose(ActionEvent actionEvent) {
+    public void showLose() {
         if (count > 0) {
             if (player == 2)
-               winWhite(actionEvent);
-            else winBlack(actionEvent);
+               winWhite();
+            else winBlack();
         }
     }
 
-    public void btnRestart(ActionEvent actionEvent) {
+    public void btnRestart() {
         gamePanel.getChildren().remove(groupHighlight);
         for (Pair<ImageView, Pair<Integer,Integer>> pair: link) {
             gamePanel.getChildren().remove(pair.getKey());
@@ -442,8 +441,14 @@ public class MainController {
             whiteScore++;
             txtScore.setText(whiteScore + "-" + blackScore);
         }
-        if (blackScore == 12) winWhite(new ActionEvent());
-        else if (whiteScore == 12) winBlack(new ActionEvent());
+        if (blackScore == 12) {
+            winWhite();
+            turnPlayer();
+        }
+        else if (whiteScore == 12) {
+            winBlack();
+            turnPlayer();
+        }
     }
 
     private void turnPlayer() {
