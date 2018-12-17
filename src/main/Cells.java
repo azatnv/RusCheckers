@@ -6,5 +6,5 @@ public enum Cells {
     WHITE,
     BLACK,
     WHITE_QUEEN,
-    BLACK_QUEEN;
+    BLACK_QUEEN
 }
