@@ -1,6 +1,8 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -15,11 +17,26 @@ class Bot {
 
     private Cells[][] board = new Cells[8][8];
     private Node root = null;
+    private Map<Cells[][], ArrayList<Cells[][]>> firstStepsAndHisMoves;
+
+    private int fromAttackX;
+    private int fromAttackY;
 
     private boolean isAttack = false;
+    private int moveFromX;
+    private int moveFromY;
+    private int moveToX;
+    private int moveToY;
 
     Bot(Cells[][] board) {
         this.board = board;
+        createTree();
+    }
+
+    Bot(Cells[][] board, int fromAttackX, int fromAttackY) {
+        this.board = board;
+        this.fromAttackX = fromAttackX;
+        this.fromAttackY = fromAttackY;
         createTree();
     }
 
@@ -27,38 +44,66 @@ class Bot {
         return this.isAttack;
     }
 
-    Cells[][] bestMove() {
+    int getMoveFromX() { return this.moveFromX; }
+    int getMoveFromY() { return this.moveFromY; }
+    int getMoveToX() { return this.moveToX; }
+    int getMoveToY() { return this.moveToY; }
+
+    void bestMove() {
         int bestEval = miniMax(root, depth, -100000, 100000, bot);
+        Node bestNode = new Node();
         for (Node child : root.getChildren()) {
             if (child.getValueMinOrMax() == bestEval) {
-                int notCompare = 0;
-                for (int x = 0; x < 8; x++)
-                    for (int y = 0; y < 8; y++)
-                        if (board[x][y] != child.getBoard()[x][y]) notCompare++;
-                isAttack = notCompare != 2;
-                return child.getBoard();  //Если не совпадений - 2, то был обычный ход, иначе >2 была атака
+                bestNode = child;
+                break;
             }
         }
-        return null;
+        Cells[][] bestFirstStep = new Cells[8][8];
+        for (Cells[][] firstStep: firstStepsAndHisMoves.keySet()) {
+            if (firstStepsAndHisMoves.get(firstStep).contains(bestNode.getBoard())) {
+                bestFirstStep = firstStep;
+            }
+        }
+        int fromID = findCellBot_From(bestFirstStep, Cells.BOT_FROM);
+        this.moveFromX = fromID / 10;
+        this.moveFromY = fromID % 10;
+        int toID = findCellBot_From(bestFirstStep, Cells.BOT_TO);
+        this.moveToX = toID / 10;
+        this.moveToY = toID % 10;
+    }
+
+    private int findCellBot_From(Cells[][] board, Cells find) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (board[x][y] == find) {
+                    return x * 10 + y;
+                }
+            }
+        }
+        return -99;
     }
 
     private void createTree() {
         root = new Node(board);
-        ArrayList<Cells[][]> moves = findAllPossibleMoves(board, bot);
-        if (moves.size() > 0) {
-           createNods(root, moves, board, bot, human);
+        Map<Cells[][], ArrayList<Cells[][]>> tableFirstMoves = findAllPossibleMoves(board, bot);
+        this.firstStepsAndHisMoves = tableFirstMoves;
+
+        if (tableFirstMoves.size() > 0) {
+           createNodes(root, tableFirstMoves, board, bot, human);
         }
     }
 
-    private void createNods(Node parent, ArrayList<Cells[][]> moves, Cells[][] board, Cells curPlayer, Cells opponent) {
+    private void createNodes(Node parent, Map<Cells[][], ArrayList<Cells[][]>> table, Cells[][] board, Cells curPlayer, Cells opponent) {
         if (curDepth++ < depth) {
-            for (Cells[][] move : moves) {
-                Node nextNode = new Node(move);
-                parent.setChild(nextNode);
+            for (ArrayList<Cells[][]> moves: table.values()) {
+                for (Cells[][] move: moves) {
+                    Node nextNode = new Node(move);
+                    parent.setChild(nextNode);
 
-                ArrayList<Cells[][]> nextMoves = findAllPossibleMoves(board, curPlayer);
-                if (nextMoves.size() > 0) {
-                    createNods(nextNode, nextMoves, board, opponent, curPlayer);
+                    Map<Cells[][], ArrayList<Cells[][]>> nextMoves = findAllPossibleMoves(board, curPlayer);
+                    if (nextMoves.size() > 0) {
+                        createNodes(nextNode, nextMoves, board, opponent, curPlayer);
+                    }
                 }
             }
         }
@@ -106,31 +151,81 @@ class Bot {
         return countWhite - countBlack;
     }
 
-    private ArrayList<Cells[][]> findAllPossibleMoves(Cells[][] board, Cells curPlayer) {
-        ArrayList<Cells[][]> allPossibleMoves = new ArrayList<>();
-        if (Functions.canMakeOneAttack(board, curPlayer)) {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Cells[][] temp = Functions.possibleAttack(x, y, board, curPlayer);
-                    if (Functions.boardContainsCell(temp, Cells.PLACE_MOVE)) {
-                        allPossibleMoves.addAll(Functions.consecutiveAttacksFromOnePosition(x, y,
-                                temp, curPlayer));
+    private Map<Cells[][], ArrayList<Cells[][]>> findAllPossibleMoves(Cells[][] board, Cells curPlayer) {
+        Map<Cells[][], ArrayList<Cells[][]>> firstStepRelatesWithHisMoves = new HashMap<>();
+        if (Functions.boardContainsCell(board, Cells.PLACE_MOVE)) {
+            for (int i = 0; i < 8; i++)
+                for (int j = 0; j < 8; j++) {
+                    if (board[i][j] == Cells.PLACE_MOVE) {
+                        Cells[][] onePlaceAttack = createBoardWithOnePlaceAttack(board, i, j);
+                        ArrayList<Cells[][]> manyMoves = Functions.consecutiveAttacksFromOnePosition(fromAttackX, fromAttackY,
+                                onePlaceAttack, curPlayer);
+
+                        Cells[][] start = Functions.cloneBoard(board);
+                        start[fromAttackX][fromAttackY] = Cells.BOT_FROM;
+                        start[i][j] = Cells.BOT_TO;
+
+                        firstStepRelatesWithHisMoves.put(start, manyMoves);
+                    }
+                }
+        } else {
+            if (Functions.canMakeOneAttack(board, curPlayer)) {
+                this.isAttack = true;
+                for (int x = 0; x < 8; x++) {
+                    for (int y = 0; y < 8; y++) {
+                        Cells[][] temp = Functions.possibleAttack(x, y, board, curPlayer);
+                        for (int i = 0; i < 8; i++)
+                            for (int j = 0; j < 8; j++) {
+                                if (temp[i][j] == Cells.PLACE_MOVE) {
+                                    Cells[][] onePlaceAttack = createBoardWithOnePlaceAttack(temp, i, j);
+                                    ArrayList<Cells[][]> manyMoves = Functions.consecutiveAttacksFromOnePosition(x, y,
+                                            onePlaceAttack, curPlayer);
+
+                                    Cells[][] start = Functions.cloneBoard(board);
+                                    start[x][y] = Cells.BOT_FROM;
+                                    start[i][j] = Cells.BOT_TO;
+
+                                    firstStepRelatesWithHisMoves.put(start, manyMoves);
+                                }
+                            }
+                    }
+                }
+            } else {
+                this.isAttack = false;
+                for (int x = 0; x < 8; x++) {
+                    for (int y = 0; y < 8; y++) {
+                        Cells[][] temp = Functions.possibleCommonMoves(x, y, board, curPlayer);
+                        for (int i = 0; i < 8; i++)
+                            for (int j = 0; j < 8; j++) {
+                                if (temp[i][j] == Cells.PLACE_MOVE) {
+                                    Cells[][] finish = Functions.commonMove(x, y, i, j, temp);
+                                    ArrayList<Cells[][]> oneMove = new ArrayList<>();
+                                    oneMove.add(finish);
+
+                                    Cells[][] start = Functions.cloneBoard(board);
+                                    start[x][y] = Cells.BOT_FROM;
+                                    start[i][j] = Cells.BOT_TO;
+
+                                    firstStepRelatesWithHisMoves.put(start, oneMove);
+                                }
+                            }
                     }
                 }
             }
-        } else {
-            for (int x = 0; x < 8; x++) {
-                for (int y = 0; y < 8; y++) {
-                    Cells[][] temp = Functions.possibleCommonMoves(x, y, board, curPlayer);
-                    for (int i = 0; i < 8; i++)
-                        for (int j = 0; j < 8; j++) {
-                            if (temp[i][j] == Cells.PLACE_MOVE)
-                                allPossibleMoves.add(Functions.commonMove(x, y, i, j, temp));
-                        }
-                }
-            }
         }
-        return allPossibleMoves;
+        return firstStepRelatesWithHisMoves;
+    }
+
+    private Cells[][] createBoardWithOnePlaceAttack(Cells[][] severalMove, int attackX, int attackY) {
+        Cells[][] clone = Functions.cloneBoard(severalMove);
+        for (int x = 0; x < 8; x++)
+            for (int y = 0; y < 8; y++) {
+                if (clone[x][y] == Cells.PLACE_MOVE)
+                    clone[x][y] = Cells.EMPTY;
+                if (x == attackX && y == attackY)
+                    clone[x][y] = Cells.PLACE_MOVE;
+            }
+        return clone;
     }
 
 }

@@ -10,7 +10,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.util.Pair;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +52,8 @@ public class MainController implements Cloneable {
     private int count = 0;
     private int oldPlaceX;
     private int oldPlaceY;
+    private int fromAttackBotX;
+    private int fromAttackBotY;
     private boolean haveOneAttack = false;
     private boolean againAttack = false;
     private boolean haveAttack;
@@ -109,14 +110,6 @@ public class MainController implements Cloneable {
             }
         }
         board = b;
-    }
-
-    private Cells[][] cloneBoard(Cells[][] mainBoard) {
-        Cells[][] boardCopy = new Cells[8][8];
-        for (int i=0; i<8; i++) {
-            System.arraycopy(mainBoard[i], 0, boardCopy[i], 0, 8);
-        }
-        return boardCopy;
     }
 
     private void winWhite() {
@@ -213,35 +206,26 @@ public class MainController implements Cloneable {
         }
 
         if (player == Cells.BLACK) {
-            Bot black = new Bot(board);
-            Cells[][] bestMove = black.bestMove();
-            int fromX = -1;
-            int fromY = -1;
-            int toX = -1;
-            int toY = -1;
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    if ((board[i][j] == Cells.BLACK_QUEEN || board[i][j] == Cells.BLACK) &&
-                            bestMove[i][j] == Cells.EMPTY) {
-                        fromX = i;
-                        fromY = j;
-                    }
-                    if ((bestMove[i][j] == Cells.BLACK_QUEEN || bestMove[i][j] == Cells.BLACK)
-                            && board[i][j] == Cells.EMPTY) {
-                        toX = i;
-                        toY = j;
-                    }
-                    oldPlaceX = fromX;
-                    oldPlaceY = fromY;
-                }
+            if (!againAttack) {
+                Bot blackBot = new Bot(board);
+                blackBot.bestMove();
+                oldPlaceX = blackBot.getMoveFromX();
+                oldPlaceY = blackBot.getMoveFromY();
+                int toX = blackBot.getMoveToX();
+                int toY = blackBot.getMoveToY();
+                if (blackBot.isAttack()) attackMove(toX, toY);
+                else commonMove(toX, toY);
+            } else {
+                Bot anotherAttackBot = new Bot(board, fromAttackBotX, fromAttackBotY);
+                anotherAttackBot.bestMove();
+                oldPlaceX = anotherAttackBot.getMoveFromX();
+                oldPlaceY = anotherAttackBot.getMoveFromY();
+                int toX = anotherAttackBot.getMoveToX();
+                int toY = anotherAttackBot.getMoveToY();
+                if (anotherAttackBot.isAttack()) attackMove(toX, toY);
+                else commonMove(toX, toY);
             }
-            if (black.isAttack()) attackMove(toX, toY);
-            else commonMove(toX, toY);
         } else {
-            System.out.println(toString(board));
-            System.out.println();
-            System.out.println();
-            System.out.println();
             int x = (int) (mouseEvent.getX()/SQUARE_SIZE);
             int y = (int) (mouseEvent.getY()/SQUARE_SIZE);
             highlightAndPossibleMoves(x, y);
@@ -251,12 +235,11 @@ public class MainController implements Cloneable {
     private void highlightAndPossibleMoves(int x, int y) {
         if (!againAttack) {
             if ((board[x][y] == player || board[x][y] == queen(player)) && haveOneAttack) {
-                Cells[][] clone = cloneBoard(board);
                 gamePanel.getChildren().remove(groupHighlight);
                 groupHighlight.getChildren().clear();
                 haveAttack = false;
                 haveCommonMoves = false;
-                clone = possibleAttacks(x, y, clone);
+                Cells[][] clone = possibleAttacks(x, y, board);
                 if (haveAttack) {
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
@@ -268,12 +251,11 @@ public class MainController implements Cloneable {
                 }
             }
             if ((board[x][y] == player || board[x][y] == queen(player)) && !haveOneAttack) {
-                Cells[][] clone = cloneBoard(board);
                 gamePanel.getChildren().remove(groupHighlight);
                 groupHighlight.getChildren().clear();
                 haveAttack = false;
                 haveCommonMoves = false;
-                clone = possibleCommonMoves(x, y, clone);
+                Cells[][] clone = possibleCommonMoves(x, y, board);
                 if (haveCommonMoves) {
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
@@ -290,24 +272,12 @@ public class MainController implements Cloneable {
             board = boardCopy;
             gamePanel.getChildren().remove(groupHighlight);
             groupHighlight.getChildren().clear();
-            if (haveCommonMoves) {
-                commonMove(x, y);
-                turnPlayer();
-                haveOneAttack = canMakeOneAttack();
-            } else {
+            if (haveCommonMoves) commonMove(x, y);
+            else {
                 attackMove(x, y);
-                Cells[][] clone = cloneBoard(board);
-                possibleAttacks(x, y, clone);
-                gamePanel.getChildren().remove(groupHighlight);
-                if (haveAttack) {
-                    againAttack = true;
-                    clone = possibleAttacks(x, y, clone);
+                if (againAttack) {
+                    boardCopy = possibleAttacks(x, y, board);
                     gamePanel.getChildren().add(groupHighlight);
-                    boardCopy = clone;
-                } else {
-                    againAttack = false;
-                    turnPlayer();
-                    haveOneAttack = canMakeOneAttack();
                 }
             }
         }
@@ -386,10 +356,9 @@ public class MainController implements Cloneable {
             }
         }
         board = Functions.commonMove(oldPlaceX, oldPlaceY, toPlaceX, toPlaceY, board);
-        if (player == Cells.BLACK) {
-            turnPlayer();
-            haveOneAttack = canMakeOneAttack();
-        }
+
+        turnPlayer();
+        haveOneAttack = canMakeOneAttack();
     }
 
     private void attackMove(int toPlaceX, int toPlaceY) {
@@ -442,6 +411,7 @@ public class MainController implements Cloneable {
             whiteScore++;
             txtScore.setText(whiteScore + "-" + blackScore);
         }
+
         if (blackScore == 12) {
             winWhite();
             turnPlayer();
@@ -450,7 +420,19 @@ public class MainController implements Cloneable {
             winBlack();
             turnPlayer();
         }
-        if (player == Cells.BLACK) {
+
+        Cells[][] possibleAgainAttack = Functions.possibleAttack(toPlaceX, toPlaceY, board, player);
+        if (Functions.boardContainsCell(possibleAgainAttack, Cells.PLACE_MOVE)) {
+            againAttack = true;
+            if (player == Cells.WHITE) {
+                boardCopy = possibleAgainAttack;
+            }
+            if (player == Cells.BLACK) {
+                fromAttackBotX = toPlaceX;
+                fromAttackBotY = toPlaceY;
+            }
+        } else {
+            againAttack = false;
             turnPlayer();
             haveOneAttack = canMakeOneAttack();
         }
@@ -481,7 +463,7 @@ public class MainController implements Cloneable {
         else return null;
     }
 
-    private String toString(Cells[][] board) {
+    private static String toString(Cells[][] board) {
         StringBuilder out = new StringBuilder();
         for (int i = 0; i < 8; i++) {
             if (i % 2 == 0)

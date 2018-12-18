@@ -1,10 +1,6 @@
 package main;
 
-import javafx.util.Pair;
-
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.pow;
@@ -12,28 +8,19 @@ import static java.lang.Math.pow;
 class Functions {
 
     static boolean canMakeOneAttack(Cells[][] board, Cells curPlayer) {
-        return !placesFromAttackIsPossible(board, curPlayer).isEmpty();
-    }
-
-    static private Set<Pair<Integer, Integer>> placesFromAttackIsPossible(Cells[][] board, Cells curPlayer) {
-        Cells[][] clone = cloneBoard(board);
-        Cells[][] compare;
-        Set<Pair<Integer, Integer>> result = new HashSet<>();
-        for (int i = 0; i < 8; i++) {
+        for (int i=0; i<8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (clone[i][j] == curPlayer || clone[i][j] == queen(curPlayer)) {
-                    compare = possibleAttack(i, j, clone, curPlayer);
-                    if (boardContainsCell(compare, Cells.PLACE_MOVE)) result.add(new Pair<>(i, j));
-                }
+                if (boardContainsCell(possibleAttack(i, j, board, curPlayer), Cells.PLACE_MOVE)) return true;
             }
         }
-        return result;
+        return false;
     }
 
     static Cells[][] possibleAttack(int fromPlaceX, int fromPlaceY,
                                                    Cells[][] board, Cells curPlayer) {
         Cells[][] clone = cloneBoard(board);
-        if (board[fromPlaceX][fromPlaceY] != curPlayer) {
+        if (clone[fromPlaceX][fromPlaceY] != curPlayer &&
+                clone[fromPlaceX][fromPlaceY] != queen(curPlayer)) {
             return clone;
         }
         for (int i=1; i<3; i++) {
@@ -68,7 +55,8 @@ class Functions {
     static Cells[][] possibleCommonMoves(int fromPlaceX, int fromPlaceY,
                                                  Cells[][] board, Cells curPlayer) {
         Cells[][] clone = cloneBoard(board);
-        if (board[fromPlaceX][fromPlaceY] != curPlayer) {
+        if (board[fromPlaceX][fromPlaceY] != curPlayer &&
+                board[fromPlaceX][fromPlaceY] != queen(curPlayer)) {
             return clone;
         }
         for (int i=1; i<3; i++) {
@@ -174,7 +162,7 @@ class Functions {
         else return null;
     }
 
-    static private Cells[][] cloneBoard(Cells[][] mainBoard) {
+    static Cells[][] cloneBoard(Cells[][] mainBoard) {
         Cells[][] boardCopy = new Cells[8][8];
         for (int i=0; i<8; i++) {
             System.arraycopy(mainBoard[i], 0, boardCopy[i], 0, 8);

@@ -15,6 +15,10 @@ class Node {
         this.currentBoard = currentBoard;
     }
 
+    Node() {
+        this.children = new ArrayList<>();
+    }
+
     int getValueMinOrMax() { return this.valueMinOrMax; }
 
     ArrayList<Node> getChildren() {
