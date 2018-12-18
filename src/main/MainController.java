@@ -138,42 +138,42 @@ public class MainController implements Cloneable {
         else System.exit(100000);
     }
 
-    public void showDraw() {         // Функция "Предолжить ничью" при игре с ботом не используется
-        if (count > 0) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Ничья?");
-            if (player == Cells.WHITE)
-                alert.setHeaderText("Белые предложили Ничью");
-            else alert.setHeaderText("Черные предложили Ничью");
-            ButtonType ok = new ButtonType("Принять");
-            ButtonType cancel = new ButtonType("Отклонить");
-            alert.getButtonTypes().clear();
-            alert.getButtonTypes().addAll(ok, cancel);
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == cancel) alert.close();
-            else {
-                alert.close();
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Ничья");
-                alert.setHeaderText("Исход игры: НИЧЬЯ\nИграть снова?");
-                ButtonType play = new ButtonType("Играть");
-                ButtonType exit = new ButtonType("Выход");
-                alert.getButtonTypes().clear();
-                alert.getButtonTypes().addAll(play, exit);
-                Optional<ButtonType> result2 = alert.showAndWait();
-                if (result2.get() == play) btnRestart();
-                else System.exit(100000);
-            }
-        }
-    }
+//    public void showDraw() {         // Функция "Предолжить ничью" при игре с ботом не используется
+//        if (count > 0) {
+//            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+//            alert.setTitle("Ничья?");
+//            if (player == Cells.WHITE)
+//                alert.setHeaderText("Белые предложили Ничью");
+//            else alert.setHeaderText("Черные предложили Ничью");
+//            ButtonType ok = new ButtonType("Принять");
+//            ButtonType cancel = new ButtonType("Отклонить");
+//            alert.getButtonTypes().clear();
+//            alert.getButtonTypes().addAll(ok, cancel);
+//            Optional<ButtonType> result = alert.showAndWait();
+//            if (result.get() == cancel) alert.close();
+//            else {
+//                alert.close();
+//                alert = new Alert(Alert.AlertType.CONFIRMATION);
+//                alert.setTitle("Ничья");
+//                alert.setHeaderText("Исход игры: НИЧЬЯ\nИграть снова?");
+//                ButtonType play = new ButtonType("Играть");
+//                ButtonType exit = new ButtonType("Выход");
+//                alert.getButtonTypes().clear();
+//                alert.getButtonTypes().addAll(play, exit);
+//                Optional<ButtonType> result2 = alert.showAndWait();
+//                if (result2.get() == play) btnRestart();
+//                else System.exit(100000);
+//            }
+//        }
+//    }
 
-    public void showLose() {
-        if (count > 0) {
-            if (player == Cells.BLACK)
-               winWhite();
-            else winBlack();
-        }
-    }
+//    public void showLose() {
+//        if (count > 0) {
+//            if (player == Cells.BLACK)
+//               winWhite();
+//            else winBlack();
+//        }
+//    }
 
     public void btnRestart() {
         gamePanel.getChildren().remove(groupHighlight);

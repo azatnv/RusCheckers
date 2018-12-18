@@ -6,14 +6,16 @@ import java.util.Map;
 
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.lang.Math.pow;
 
 class Bot {
 
     private Cells bot = Cells.BLACK;
     private Cells human = Cells.WHITE;
 
-    private int depth = 9;
-    private int curDepth = 1;
+    //Оценка проводится для наилучшего расположения черных.
+    private int depth = 3;
+    private int curDepth = 0;
 
     private Cells[][] board = new Cells[8][8];
     private Node root = null;
@@ -113,7 +115,6 @@ class Bot {
         if (depth == 0) {
             return evaluation(position);
         }
-
         if (maximizingPlayer == bot) {
             int maxEval = -100000;
             for (Node child: position.getChildren()){
@@ -137,18 +138,61 @@ class Bot {
         }
     }
 
-    private int evaluation(Node endPos) {
-        Cells[][] endPosBoard = endPos.getBoard();
-        int countWhite = 0;
-        int countBlack = 0;
-        for (int x = 0; x < 8; x++)
+    private int evaluation(Node end) {
+        Cells[][] endPos = end.getBoard();
+        int commonWhite = 0;
+        int queenWhite = 0;
+        int commonBlack = 0;
+        int queenBlack = 0;
+        int emptyAround = 0;
+        int lockPos = 0;
+        int unlockPos = 0;
+        int advantageInFront = 0;
+        int corner = 0;
+        int leftOrRightSide = 0;
+        for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
-                if (endPosBoard[x][y] == Cells.WHITE_QUEEN) countWhite += 4;
-                else if (endPosBoard[x][y] == Cells.WHITE) countWhite += 1;
-                else if (endPosBoard[x][y] == Cells.BLACK_QUEEN) countBlack += 4;
-                else if (endPosBoard[x][y] == Cells.BLACK) countBlack += 1;
+                if (endPos[x][y] == Cells.WHITE) commonWhite++;
+                if (endPos[x][y] == Cells.WHITE_QUEEN) queenWhite++;
+                if (endPos[x][y] == Cells.BLACK_QUEEN || endPos[x][y] == Cells.BLACK) {
+                    if (endPos[x][y] == Cells.BLACK) commonBlack++;
+                    if (endPos[x][y] == Cells.BLACK_QUEEN) queenBlack++;
+
+                    for (int i = 1; i < 3; i++) {
+                        int newX = (int) (x + pow(-1, i));
+                        int newY = y + 1;
+
+                        if (isOnBoard(newX, newY) && endPos[newX][newY] == Cells.EMPTY ||
+                                isOnBoard(-newX, -newY) && endPos[-newX][-newY] == Cells.EMPTY) emptyAround++;
+
+                        if (isOnBoard(newX, newY) && isOnBoard(-newX, -newY) &&
+                                (getOpponent(endPos[newX][newY]) == bot && getOpponent(endPos[-newX][-newY]) == human ||
+                                        getOpponent(endPos[newX][newY]) == human && getOpponent(endPos[-newX][-newY]) == bot ||
+                                        getOpponent(endPos[newX][newY]) == human || getOpponent(endPos[-newX][-newY]) == human))
+                            lockPos++;
+                        if (isOnBoard(newX, newY) && isOnBoard(-newX, -newY) &&
+                                (endPos[newX][newY] == Cells.EMPTY && getOpponent(endPos[-newX][-newY]) == human ||
+                                        getOpponent(endPos[newX][newY]) == human && getOpponent(endPos[-newX][-newY]) == Cells.EMPTY))
+                            unlockPos++;
+                    }
+
+                    if (y > 3 && y < 6 && x > 1 && x < 6) {
+                        if (getOpponent(endPos[x + 1][y + 1]) != Cells.BLACK && getOpponent(endPos[x - 1][y + 1]) != Cells.BLACK &&
+                                getOpponent(endPos[x + 2][y + 2]) != Cells.BLACK && getOpponent(endPos[x - 2][y + 2]) != Cells.BLACK &&
+                                getOpponent(endPos[x][y + 2]) != Cells.BLACK && getOpponent(endPos[x - 2][y]) != Cells.BLACK &&
+                                getOpponent(endPos[x + 2][y]) != Cells.BLACK)
+                            advantageInFront++;
+                    }
+
+                    if (x == 7 && y == 6 && getOpponent(endPos[6][7]) != Cells.WHITE) corner++;
+
+                    if (x == 0 && (y == 1 || y == 3 || y == 5 || y == 7) || x == 7 && (y == 2 || y == 4 || y == 6))
+                        leftOrRightSide++;
+                }
             }
-        return countWhite - countBlack;
+        }
+        return 30*(((int) (pow(2.5, queenBlack + 1) - 2.5))-((int) (pow(2.5, queenWhite + 1) - 2.5))) + 100*advantageInFront +
+                10*lockPos - 15*unlockPos + (int)(0.5*emptyAround) + 17*(commonBlack-commonWhite) + 18*corner + 8*leftOrRightSide;
     }
 
     private Map<Cells[][], ArrayList<Cells[][]>> findAllPossibleMoves(Cells[][] board, Cells curPlayer) {
@@ -226,6 +270,18 @@ class Bot {
                     clone[x][y] = Cells.PLACE_MOVE;
             }
         return clone;
+    }
+
+    private boolean isOnBoard(int x, int y) {
+        int HEIGHT = 8;
+        int WIDTH = 8;
+        return (x >= 0 && x < HEIGHT && y >= 0  && y < WIDTH);
+    }
+
+    private Cells getOpponent(Cells player) {
+        if (player == Cells.WHITE || player == Cells.WHITE_QUEEN) return Cells.BLACK;
+        else if (player == Cells.BLACK || player == Cells.BLACK_QUEEN) return Cells.WHITE;
+        else return Cells.PLACE_MOVE;
     }
 
 }
