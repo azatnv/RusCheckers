@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static java.lang.Math.abs;
 
-
 public class MainController implements Cloneable {
     public ImageView b1;
     public ImageView b2;
@@ -50,6 +49,7 @@ public class MainController implements Cloneable {
     public Pane gamePanel;
 
     private int count = 0;
+    private boolean wait = false;
     private int oldPlaceX;
     private int oldPlaceY;
     private int fromAttackBotX;
@@ -58,7 +58,7 @@ public class MainController implements Cloneable {
     private boolean againAttack = false;
     private boolean haveAttack;
     private boolean haveCommonMoves;
-    private Cells player = Cells.WHITE;
+    private Cells player = Cells.BLACK;
     private Cells[][] board = new Cells[8][8]; //[X][Y]
     private Cells[][] boardCopy = new Cells[8][8]; //[X][Y]
     private Group groupHighlight = new Group();
@@ -198,15 +198,17 @@ public class MainController implements Cloneable {
         txtScore.setText(whiteScore + "-" + blackScore);
     }
 
+
+
     public void onMouseClicked(MouseEvent mouseEvent) {
         count++;
         if (count == 1) {
             setBoard(new Cells[8][8]);
             setRelations(new ArrayList<>());
         }
-
-        if (player == Cells.BLACK) {
+        if (player == Cells.BLACK && !wait) {
             if (!againAttack) {
+                wait = true;
                 Bot blackBot = new Bot(board);
                 blackBot.bestMove();
                 oldPlaceX = blackBot.getMoveFromX();
@@ -216,16 +218,16 @@ public class MainController implements Cloneable {
                 if (blackBot.isAttack()) attackMove(toX, toY);
                 else commonMove(toX, toY);
             } else {
+                wait = true;
                 Bot anotherAttackBot = new Bot(board, fromAttackBotX, fromAttackBotY);
                 anotherAttackBot.bestMove();
                 oldPlaceX = anotherAttackBot.getMoveFromX();
                 oldPlaceY = anotherAttackBot.getMoveFromY();
                 int toX = anotherAttackBot.getMoveToX();
                 int toY = anotherAttackBot.getMoveToY();
-                if (anotherAttackBot.isAttack()) attackMove(toX, toY);
-                else commonMove(toX, toY);
+                attackMove(toX, toY);
             }
-        } else {
+        } else if (player == Cells.WHITE && !wait) {
             int x = (int) (mouseEvent.getX()/SQUARE_SIZE);
             int y = (int) (mouseEvent.getY()/SQUARE_SIZE);
             highlightAndPossibleMoves(x, y);
@@ -240,6 +242,7 @@ public class MainController implements Cloneable {
                 haveAttack = false;
                 haveCommonMoves = false;
                 Cells[][] clone = possibleAttacks(x, y, board);
+
                 if (haveAttack) {
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
@@ -255,6 +258,7 @@ public class MainController implements Cloneable {
                 groupHighlight.getChildren().clear();
                 haveAttack = false;
                 haveCommonMoves = false;
+                boardCopy = Functions.cloneBoard(board);
                 Cells[][] clone = possibleCommonMoves(x, y, board);
                 if (haveCommonMoves) {
                     gamePanel.getChildren().add(groupHighlight);
@@ -269,7 +273,7 @@ public class MainController implements Cloneable {
         }
 
         if (boardCopy[x][y] == Cells.PLACE_MOVE) {
-            board = boardCopy;
+            wait = true;
             gamePanel.getChildren().remove(groupHighlight);
             groupHighlight.getChildren().clear();
             if (haveCommonMoves) commonMove(x, y);
@@ -359,6 +363,7 @@ public class MainController implements Cloneable {
 
         turnPlayer();
         haveOneAttack = canMakeOneAttack();
+        wait = false;
     }
 
     private void attackMove(int toPlaceX, int toPlaceY) {
@@ -436,6 +441,7 @@ public class MainController implements Cloneable {
             turnPlayer();
             haveOneAttack = canMakeOneAttack();
         }
+        wait = false;
     }
 
     private void turnPlayer() {

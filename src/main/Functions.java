@@ -8,9 +8,10 @@ import static java.lang.Math.pow;
 class Functions {
 
     static boolean canMakeOneAttack(Cells[][] board, Cells curPlayer) {
+        Cells[][] clone = cloneBoard(board);
         for (int i=0; i<8; i++) {
             for (int j = 0; j < 8; j++) {
-                if (boardContainsCell(possibleAttack(i, j, board, curPlayer), Cells.PLACE_MOVE)) return true;
+                if (boardContainsCell(possibleAttack(i, j, clone, curPlayer), Cells.PLACE_MOVE)) return true;
             }
         }
         return false;
@@ -86,65 +87,68 @@ class Functions {
 
     static Cells[][] commonMove(int fromPlaceX, int fromPlaceY, int toPlaceX, int toPlaceY,
                                     Cells[][] board) {
-        board[toPlaceX][toPlaceY] = board[fromPlaceX][fromPlaceY];
-        board[fromPlaceX][fromPlaceY] = Cells.EMPTY;
+        Cells[][] clone = cloneBoard(board);
+        clone[toPlaceX][toPlaceY] = clone[fromPlaceX][fromPlaceY];
+        clone[fromPlaceX][fromPlaceY] = Cells.EMPTY;
 
         for (int i=0; i<8; i++) {
             for (int j=0; j<8; j++) {
-                if (board[i][j] == Cells.PLACE_MOVE) {
-                    board[i][j] = Cells.EMPTY;
+                if (clone[i][j] == Cells.PLACE_MOVE) {
+                    clone[i][j] = Cells.EMPTY;
                 }
             }
         }
 
-        if ((toPlaceY == 0 || toPlaceY == 7) && (board[toPlaceX][toPlaceY] == Cells.WHITE ||
-                board[toPlaceX][toPlaceY] == Cells.BLACK)) {
-            if (toPlaceY == 0) board[toPlaceX][toPlaceY] = Cells.WHITE_QUEEN;
-            else board[toPlaceX][toPlaceY] = Cells.BLACK_QUEEN;
+        if ((toPlaceY == 0 || toPlaceY == 7) && (clone[toPlaceX][toPlaceY] == Cells.WHITE ||
+                clone[toPlaceX][toPlaceY] == Cells.BLACK)) {
+            if (toPlaceY == 0) clone[toPlaceX][toPlaceY] = Cells.WHITE_QUEEN;
+            else clone[toPlaceX][toPlaceY] = Cells.BLACK_QUEEN;
         }
 
-        return board;
+        return clone;
     }
 
     static Cells[][] attackMove(int fromPlaceX, int fromPlaceY, int toPlaceX, int toPlaceY,
                                          Cells[][] board, Cells curPlayer) {
-        board[toPlaceX][toPlaceY] = board[fromPlaceX][fromPlaceY];
-        board[fromPlaceX][fromPlaceY] = Cells.EMPTY;
+        Cells[][] clone = cloneBoard(board);
+        clone[toPlaceX][toPlaceY] = clone[fromPlaceX][fromPlaceY];
+        clone[fromPlaceX][fromPlaceY] = Cells.EMPTY;
 
         for (int i=0; i<8; i++) {
             for (int j=0; j<8; j++) {
-                if (board[i][j] == Cells.PLACE_MOVE) {
-                    board[i][j] = Cells.EMPTY;
+                if (clone[i][j] == Cells.PLACE_MOVE) {
+                    clone[i][j] = Cells.EMPTY;
                 }
             }
         }
 
-        if (toPlaceY == 0 && board[toPlaceX][toPlaceY] == Cells.WHITE)
-            board[toPlaceX][toPlaceY] = Cells.WHITE_QUEEN;
-        if (toPlaceY == 7 && board[toPlaceX][toPlaceY] == Cells.BLACK)
-            board[toPlaceX][toPlaceY] = Cells.BLACK_QUEEN;
+        if (toPlaceY == 0 && clone[toPlaceX][toPlaceY] == Cells.WHITE)
+            clone[toPlaceX][toPlaceY] = Cells.WHITE_QUEEN;
+        if (toPlaceY == 7 && clone[toPlaceX][toPlaceY] == Cells.BLACK)
+            clone[toPlaceX][toPlaceY] = Cells.BLACK_QUEEN;
 
         int directionX = (toPlaceX - fromPlaceX) / abs(toPlaceX - fromPlaceX);
         int directionY = (toPlaceY - fromPlaceY) / abs(toPlaceY - fromPlaceY);
         for (;;) {
-            if (getOpponent(board[fromPlaceX + directionX][fromPlaceY + directionY]) == curPlayer) {
-                board[fromPlaceX + directionX][fromPlaceY + directionY] = Cells.EMPTY;
+            if (getOpponent(clone[fromPlaceX + directionX][fromPlaceY + directionY]) == curPlayer) {
+                clone[fromPlaceX + directionX][fromPlaceY + directionY] = Cells.EMPTY;
                 break;
             }
             directionX += directionX / abs(directionX);
             directionY += directionY/ abs(directionY);
         }
 
-        return board;
+        return clone;
     }
 
     static ArrayList<Cells[][]> consecutiveAttacksFromOnePosition(int fromX, int fromY,
                                                                          Cells[][] board, Cells curPlayer) {
+        Cells[][] clone = cloneBoard(board);
         ArrayList<Cells[][]> result = new ArrayList<>();
         for (int i=0; i<8; i++)
             for (int j=0; j<8; j++) {
-                if (board[i][j] == Cells.PLACE_MOVE) {
-                    Cells[][] withoutCellOfAttack = attackMove(fromX, fromY, i, j, board, curPlayer);
+                if (clone[i][j] == Cells.PLACE_MOVE) {
+                    Cells[][] withoutCellOfAttack = attackMove(fromX, fromY, i, j, clone, curPlayer);
                     Cells[][] newBoard = possibleAttack(i, j, withoutCellOfAttack, curPlayer);
                     if (boardContainsCell(newBoard, Cells.PLACE_MOVE)) {
                         result.addAll(consecutiveAttacksFromOnePosition(i, j, newBoard, curPlayer));
@@ -187,6 +191,16 @@ class Functions {
             for (Cells element : cells)
                 if (element == cell) return true;
         return false;
+    }
+
+    static int amountOfDifferences(Cells[][] first, Cells[][] second) {
+        int count = 0;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (first[i][j] != second[i][j]) count++;
+            }
+        }
+        return count;
     }
 
 }

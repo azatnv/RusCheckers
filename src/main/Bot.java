@@ -14,8 +14,7 @@ class Bot {
     private Cells human = Cells.WHITE;
 
     //Оценка проводится для наилучшего расположения черных.
-    private int depth = 3;
-    private int curDepth = 0;
+    private int depth = 4;
 
     private Cells[][] board = new Cells[8][8];
     private Node root = null;
@@ -31,14 +30,15 @@ class Bot {
     private int moveToY;
 
     Bot(Cells[][] board) {
-        this.board = board;
+        this.board = Functions.cloneBoard(board);
         createTree();
     }
 
     Bot(Cells[][] board, int fromAttackX, int fromAttackY) {
-        this.board = board;
+        this.board = Functions.possibleAttack(fromAttackX, fromAttackY, board, bot);
         this.fromAttackX = fromAttackX;
         this.fromAttackY = fromAttackY;
+        this.isAttack = true;
         createTree();
     }
 
@@ -53,18 +53,21 @@ class Bot {
 
     void bestMove() {
         int bestEval = miniMax(root, depth, -100000, 100000, bot);
-        Node bestNode = new Node();
+        Cells[][] bestBoard = new Cells[8][8];
         for (Node child : root.getChildren()) {
             if (child.getValueMinOrMax() == bestEval) {
-                bestNode = child;
+                bestBoard = child.getBoard();
                 break;
             }
         }
         Cells[][] bestFirstStep = new Cells[8][8];
         for (Cells[][] firstStep: firstStepsAndHisMoves.keySet()) {
-            if (firstStepsAndHisMoves.get(firstStep).contains(bestNode.getBoard())) {
+            if (firstStepsAndHisMoves.get(firstStep).contains(bestBoard)) {
                 bestFirstStep = firstStep;
             }
+        }
+        if (!isAttack && Functions.amountOfDifferences(bestBoard, bestFirstStep)>2) {
+            this.isAttack = true;
         }
         int fromID = findCellBot_From(bestFirstStep, Cells.BOT_FROM);
         this.moveFromX = fromID / 10;
@@ -91,20 +94,26 @@ class Bot {
         this.firstStepsAndHisMoves = tableFirstMoves;
 
         if (tableFirstMoves.size() > 0) {
-           createNodes(root, tableFirstMoves, board, bot, human);
+           createNodes(root, tableFirstMoves, bot, human);
         }
     }
 
-    private void createNodes(Node parent, Map<Cells[][], ArrayList<Cells[][]>> table, Cells[][] board, Cells curPlayer, Cells opponent) {
-        if (curDepth++ < depth) {
-            for (ArrayList<Cells[][]> moves: table.values()) {
-                for (Cells[][] move: moves) {
+    private void createNodes(Node parent, Map<Cells[][], ArrayList<Cells[][]>> table, Cells curPlayer, Cells opponent) {
+        int curDepth = 1;
+        ArrayList<Node> start = root.getChildren();
+        while (!start.isEmpty()) {
+            start = start.get(start.size() - 1).getChildren();
+            curDepth++;
+        }
+        if (curDepth < depth) {
+            for (ArrayList<Cells[][]> moves : table.values()) {
+                for (Cells[][] move : moves) {
                     Node nextNode = new Node(move);
                     parent.setChild(nextNode);
 
-                    Map<Cells[][], ArrayList<Cells[][]>> nextMoves = findAllPossibleMoves(board, curPlayer);
+                    Map<Cells[][], ArrayList<Cells[][]>> nextMoves = findAllPossibleMoves(move, opponent);
                     if (nextMoves.size() > 0) {
-                        createNodes(nextNode, nextMoves, board, opponent, curPlayer);
+                        createNodes(nextNode, nextMoves, opponent, curPlayer);
                     }
                 }
             }
@@ -191,8 +200,10 @@ class Bot {
                 }
             }
         }
-        return 30*(((int) (pow(2.5, queenBlack + 1) - 2.5))-((int) (pow(2.5, queenWhite + 1) - 2.5))) + 100*advantageInFront +
-                10*lockPos - 15*unlockPos + (int)(0.5*emptyAround) + 17*(commonBlack-commonWhite) + 18*corner + 8*leftOrRightSide;
+        if (commonBlack + commonWhite < 14) return -(43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4)))
+                + 71*(commonBlack-commonWhite) + 5*lockPos - 7*unlockPos);
+        return  -(43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4))) + 50*advantageInFront +
+                5*lockPos - 7*unlockPos + (int)(0.25*emptyAround) + 89*(commonBlack-commonWhite) + 18*corner + 5*leftOrRightSide);
     }
 
     private Map<Cells[][], ArrayList<Cells[][]>> findAllPossibleMoves(Cells[][] board, Cells curPlayer) {
@@ -201,41 +212,37 @@ class Bot {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++) {
                     if (board[i][j] == Cells.PLACE_MOVE) {
-                        Cells[][] onePlaceAttack = createBoardWithOnePlaceAttack(board, i, j);
+                        Cells[][] onePlaceAttack = createBoardWithOnePlaceMove(board, i, j);
                         ArrayList<Cells[][]> manyMoves = Functions.consecutiveAttacksFromOnePosition(fromAttackX, fromAttackY,
                                 onePlaceAttack, curPlayer);
 
-                        Cells[][] start = Functions.cloneBoard(board);
-                        start[fromAttackX][fromAttackY] = Cells.BOT_FROM;
-                        start[i][j] = Cells.BOT_TO;
+                        onePlaceAttack[fromAttackX][fromAttackY] = Cells.BOT_FROM;
+                        onePlaceAttack[i][j] = Cells.BOT_TO;
 
-                        firstStepRelatesWithHisMoves.put(start, manyMoves);
+                        firstStepRelatesWithHisMoves.put(onePlaceAttack, manyMoves);
                     }
                 }
         } else {
             if (Functions.canMakeOneAttack(board, curPlayer)) {
-                this.isAttack = true;
                 for (int x = 0; x < 8; x++) {
                     for (int y = 0; y < 8; y++) {
                         Cells[][] temp = Functions.possibleAttack(x, y, board, curPlayer);
                         for (int i = 0; i < 8; i++)
                             for (int j = 0; j < 8; j++) {
                                 if (temp[i][j] == Cells.PLACE_MOVE) {
-                                    Cells[][] onePlaceAttack = createBoardWithOnePlaceAttack(temp, i, j);
+                                    Cells[][] onePlaceAttack = createBoardWithOnePlaceMove(temp, i, j);
                                     ArrayList<Cells[][]> manyMoves = Functions.consecutiveAttacksFromOnePosition(x, y,
                                             onePlaceAttack, curPlayer);
 
-                                    Cells[][] start = Functions.cloneBoard(board);
-                                    start[x][y] = Cells.BOT_FROM;
-                                    start[i][j] = Cells.BOT_TO;
+                                    onePlaceAttack[x][y] = Cells.BOT_FROM;
+                                    onePlaceAttack[i][j] = Cells.BOT_TO;
 
-                                    firstStepRelatesWithHisMoves.put(start, manyMoves);
+                                    firstStepRelatesWithHisMoves.put(onePlaceAttack, manyMoves);
                                 }
                             }
                     }
                 }
             } else {
-                this.isAttack = false;
                 for (int x = 0; x < 8; x++) {
                     for (int y = 0; y < 8; y++) {
                         Cells[][] temp = Functions.possibleCommonMoves(x, y, board, curPlayer);
@@ -246,11 +253,11 @@ class Bot {
                                     ArrayList<Cells[][]> oneMove = new ArrayList<>();
                                     oneMove.add(finish);
 
-                                    Cells[][] start = Functions.cloneBoard(board);
-                                    start[x][y] = Cells.BOT_FROM;
-                                    start[i][j] = Cells.BOT_TO;
+                                    Cells[][] onePlaceMove = createBoardWithOnePlaceMove(temp, i, j);
+                                    onePlaceMove[x][y] = Cells.BOT_FROM;
+                                    onePlaceMove[i][j] = Cells.BOT_TO;
 
-                                    firstStepRelatesWithHisMoves.put(start, oneMove);
+                                    firstStepRelatesWithHisMoves.put(onePlaceMove, oneMove);
                                 }
                             }
                     }
@@ -260,7 +267,7 @@ class Bot {
         return firstStepRelatesWithHisMoves;
     }
 
-    private Cells[][] createBoardWithOnePlaceAttack(Cells[][] severalMove, int attackX, int attackY) {
+    private Cells[][] createBoardWithOnePlaceMove(Cells[][] severalMove, int attackX, int attackY) {
         Cells[][] clone = Functions.cloneBoard(severalMove);
         for (int x = 0; x < 8; x++)
             for (int y = 0; y < 8; y++) {
