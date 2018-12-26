@@ -17,37 +17,38 @@ import static java.lang.Math.abs;
 
 public class MainController implements Cloneable {
 
+    static final int WIDTH = 8;
+    static final int BOARD_EDGE_FOR_WHITE = 0;
+    static final int BOARD_EDGE_FOR_BLACK = 7;
+    private static final int END_WHITE_SIDE = 5;
+    private static final int END_BLACK_SIDE = 2;
+    private final double SQUARE_SIZE = 80.0;
+
+    private GameBoard game;
+
     public ImageView turnImage;
     public Text txtScore;
-    private int whiteScore = 0;
-    private int blackScore = 0;
-
     public Pane gamePanel;
+
+    private int whiteScore;
+    private int blackScore;
 
     private int count = 0;
     private boolean wait = false;
-    private int oldPlaceX;
-    private int oldPlaceY;
-    private int fromAttackBotX;
-    private int fromAttackBotY;
-    private boolean haveOneAttack = false;
-    private boolean againAttack = false;
-    private boolean haveAttack;
-    private boolean haveCommonMoves;
-    private Cells player = Cells.WHITE;
-    private Cells[][] board = new Cells[8][8]; //[X][Y]
-    private Cells[][] boardCopy = new Cells[8][8]; //[X][Y]
+
+    private Player firstPlayer = Player.HUMAN;
+    private Cells[][] firstBoard = new Cells[WIDTH][WIDTH]; //[X][Y]
+
     private Group groupHighlight = new Group();
-    private final double SQUARE_SIZE = 80.0;
     private List<Pair<ImageView, Pair<Integer, Integer>>> relations;
     private Image contour = new Image("main/fxml/Contour.png");
     private Image hatchCell = new Image("main/fxml/Hatching.png");
     private Image black = new Image("main/fxml/Black80.png");
     private Image white = new Image("main/fxml/White80.png");
 
-    private void setBoard(Cells[][] b, List<Pair<ImageView, Pair<Integer, Integer>>> list) {
-        for (int x=0; x<8; x++) {
-            for (int y=0; y<3; y++) {
+    private void setFirstBoard(Cells[][] b, List<Pair<ImageView, Pair<Integer, Integer>>> list) {
+        for (int x=0; x < WIDTH; x++) {
+            for (int y=0; y <= END_BLACK_SIDE; y++) {
                 if ((x+y)%2==1) {
                     b[x][y] = Cells.BLACK;
                     ImageView view = new ImageView(black);
@@ -57,10 +58,10 @@ public class MainController implements Cloneable {
                 }
                 else b[x][y] = Cells.EMPTY;
             }
-            for (int y=3; y<5; y++) {
+            for (int y = END_BLACK_SIDE + 1; y < END_WHITE_SIDE; y++) {
                 b[x][y] = Cells.EMPTY;
             }
-            for (int y=5; y<8; y++) {
+            for (int y = END_WHITE_SIDE; y < WIDTH; y++) {
                 if ((x+y)%2==1) {
                     b[x][y] = Cells.WHITE;
                     ImageView view = new ImageView(white);
@@ -72,7 +73,7 @@ public class MainController implements Cloneable {
             }
         }
         relations = list;
-        board = b;
+        firstBoard = b;
     }
 
     private void winWhite() {
@@ -144,315 +145,130 @@ public class MainController implements Cloneable {
         for (Pair<ImageView, Pair<Integer,Integer>> pair: relations) {
             gamePanel.getChildren().remove(pair.getKey());
         }
-        setBoard(new Cells[8][8], new ArrayList<>());
-        haveOneAttack = false;
-        againAttack = false;
-        haveAttack = false;
-        haveCommonMoves = false;
-        player = Cells.WHITE;
+        if (count == 0) setFirstBoard(new Cells[WIDTH][WIDTH], new ArrayList<>());
         turnImage.setImage(new Image("main/fxml/White20.png"));
+        count = 0;
         whiteScore = 0;
         blackScore = 0;
-        txtScore.setText(whiteScore + "-" + blackScore);
+        setTxtScore(whiteScore, blackScore);
     }
 
     public void onMouseClicked(MouseEvent mouseEvent) {
         count++;
         if (count == 1) {
-            setBoard(new Cells[8][8], new ArrayList<>());
-        }
-        if (player == Cells.BLACK && !wait) {
-            if (!againAttack) {
-                wait = true;
-                Bot blackBot = new Bot(board, player);
-                blackBot.bestMove();
-                oldPlaceX = blackBot.getMoveFromX();
-                oldPlaceY = blackBot.getMoveFromY();
-                int toX = blackBot.getMoveToX();
-                int toY = blackBot.getMoveToY();
-                if (blackBot.isAttack()) attackMove(toX, toY);
-                else commonMove(toX, toY);
-            } else {
-                wait = true;
-                Bot anotherAttackBot = new Bot(board, fromAttackBotX, fromAttackBotY, player);
-                anotherAttackBot.bestMove();
-                oldPlaceX = anotherAttackBot.getMoveFromX();
-                oldPlaceY = anotherAttackBot.getMoveFromY();
-                int toX = anotherAttackBot.getMoveToX();
-                int toY = anotherAttackBot.getMoveToY();
-                attackMove(toX, toY);
-            }
-        } else if (player == Cells.WHITE && !wait) {
-            int x = (int) (mouseEvent.getX()/SQUARE_SIZE);
-            int y = (int) (mouseEvent.getY()/SQUARE_SIZE);
-            highlightAndPossibleMoves(x, y);
-        }
-    }
-
-    private void highlightAndPossibleMoves(int x, int y) {
-        if (!againAttack) {
-            if ((board[x][y] == player || board[x][y] == queen(player)) && haveOneAttack) {
-                gamePanel.getChildren().remove(groupHighlight);
-                groupHighlight.getChildren().clear();
-                haveAttack = false;
-                haveCommonMoves = false;
-                boardCopy = Functions.cloneBoard(board);
-                Cells[][] clone = possibleAttacks(x, y, board);
-                if (haveAttack) {
-                    gamePanel.getChildren().add(groupHighlight);
-                    boardCopy = clone;
-                } else {
-                    ImageView viewContour = new ImageView(contour);
-                    viewContour.relocate(x * SQUARE_SIZE, y * SQUARE_SIZE);
-                    groupHighlight.getChildren().add(viewContour);
-                    gamePanel.getChildren().add(groupHighlight);
-                }
-            }
-            if ((board[x][y] == player || board[x][y] == queen(player)) && !haveOneAttack) {
-                gamePanel.getChildren().remove(groupHighlight);
-                groupHighlight.getChildren().clear();
-                haveAttack = false;
-                haveCommonMoves = false;
-                boardCopy = Functions.cloneBoard(board);
-                Cells[][] clone = possibleCommonMoves(x, y, board);
-                if (haveCommonMoves) {
-                    gamePanel.getChildren().add(groupHighlight);
-                    boardCopy = clone;
-                } else {
-                    ImageView viewContour = new ImageView(contour);
-                    viewContour.relocate(x * SQUARE_SIZE, y * SQUARE_SIZE);
-                    groupHighlight.getChildren().add(viewContour);
-                    gamePanel.getChildren().add(groupHighlight);
-                }
-            }
+            setFirstBoard(new Cells[WIDTH][WIDTH], new ArrayList<>());
+            game = new GameBoard(firstBoard, firstPlayer);
         }
 
-        if (boardCopy[x][y] == Cells.PLACE_MOVE) {
+        if (game.getTurn() == Player.COMPUTER && !wait) {
+            wait = true;
+            Cells[][] before = game.getBoard();
+            game.moveComputer();
+            int from = game.getFromID();
+            int to = game.getToID();
+            boolean isAttack = game.isAttack();
+            whiteScore = game.getWhiteScore();
+            blackScore = game.getBlackScore();
+            relocate(from/10, from%10, to/10, to%10, before, Player.COMPUTER, isAttack);
+            wait = false;
+        }
+        else if (game.getTurn() == Player.HUMAN && !wait) {
             wait = true;
             gamePanel.getChildren().remove(groupHighlight);
             groupHighlight.getChildren().clear();
-            if (haveCommonMoves) commonMove(x, y);
-            else {
-                attackMove(x, y);
-                if (againAttack) {
-                    boardCopy = possibleAttacks(x, y, board);
-                    gamePanel.getChildren().add(groupHighlight);
-                }
+            int x = (int) (mouseEvent.getX()/SQUARE_SIZE);
+            int y = (int) (mouseEvent.getY()/SQUARE_SIZE);
+
+            Cells[][] before = game.getBoard();
+            if (before[x][y] == Cells.WHITE) {            //Создать PLAYER-ов
+                ImageView view1 = new ImageView(contour);
+                view1.relocate(x * SQUARE_SIZE, y * SQUARE_SIZE);
+                groupHighlight.getChildren().add(view1);
             }
-        }
-    }
-
-    private boolean canMakeOneAttack() {
-        return Functions.canMakeOneAttack(board, player);
-    }
-
-    private Cells[][] possibleAttacks(int fromPlaceX, int fromPlaceY, Cells[][] clone) {
-        haveAttack = false;
-        oldPlaceX = fromPlaceX;
-        oldPlaceY = fromPlaceY;
-        ImageView viewContour = new ImageView(contour);
-        viewContour.relocate(fromPlaceX*SQUARE_SIZE, fromPlaceY*SQUARE_SIZE);
-        groupHighlight.getChildren().add(viewContour);
-
-        Cells[][] result = Functions.possibleAttack(fromPlaceX, fromPlaceY, clone, player);
-        for (int toPlaceX = 0; toPlaceX < 8; toPlaceX++) {
-            for (int toPlaceY = 0; toPlaceY < 8; toPlaceY++) {
-                if (result[toPlaceX][toPlaceY] == Cells.PLACE_MOVE) {
-                    haveAttack = true;
-                    ImageView viewHatching = new ImageView(hatchCell);
-                    viewHatching.relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    groupHighlight.getChildren().add(viewHatching);
-                }
-            }
-        }
-        return result;
-    }
-
-    private Cells[][] possibleCommonMoves(int fromPlaceX, int fromPlaceY, Cells[][] clone) {
-        oldPlaceX = fromPlaceX;
-        oldPlaceY = fromPlaceY;
-        haveCommonMoves = false;
-        ImageView viewContour = new ImageView(contour);
-        viewContour.relocate(fromPlaceX*SQUARE_SIZE, fromPlaceY*SQUARE_SIZE);
-        groupHighlight.getChildren().add(viewContour);
-
-        Cells[][] result = Functions.possibleCommonMoves(fromPlaceX, fromPlaceY, clone, player);
-        for (int toPlaceX = 0; toPlaceX < 8; toPlaceX++) {
-            for (int toPlaceY = 0; toPlaceY < 8; toPlaceY++) {
-                if (result[toPlaceX][toPlaceY] == Cells.PLACE_MOVE) {
-                    haveCommonMoves = true;
-                    ImageView viewHatching = new ImageView(hatchCell);
-                    viewHatching.relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    groupHighlight.getChildren().add(viewHatching);
-                }
-            }
-        }
-        return result;
-    }
-
-    private void commonMove(int toPlaceX, int toPlaceY) {
-        for (Pair<ImageView, Pair<Integer, Integer>> element: relations) {
-            if (oldPlaceX == element.getValue().getKey() &&
-                    oldPlaceY == element.getValue().getValue()) {
-                gamePanel.getChildren().remove(element.getKey());
-                if ((toPlaceY == 0 && board[oldPlaceX][oldPlaceY] == Cells.WHITE) ||
-                        (toPlaceY == 7 && board[oldPlaceX][oldPlaceY] == Cells.BLACK)) {
-                    relations.remove(element);
-                    Image imageQueen;
-                    if (toPlaceY == 0) imageQueen = new Image("main/fxml/WhiteQueen80.png");
-                    else imageQueen = new Image("main/fxml/BlackQueen80.png");
-                    ImageView viewQueen = new ImageView(imageQueen);
-                    viewQueen.relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    gamePanel.getChildren().add(viewQueen);
-                    relations.add(new Pair<>(viewQueen, new Pair<>(toPlaceX, toPlaceY)));
-                } else {
-                    element.getKey().relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    gamePanel.getChildren().add(element.getKey());
-                    relations.remove(element);
-                    relations.add(new Pair<>(element.getKey(), new Pair<>(toPlaceX, toPlaceY)));
-                }
-                break;
-            }
-        }
-        board = Functions.commonMove(oldPlaceX, oldPlaceY, toPlaceX, toPlaceY, board);
-        boardCopy = Functions.cloneBoard(board);
-
-        turnPlayer();
-        haveOneAttack = canMakeOneAttack();
-        wait = false;
-    }
-
-    private void attackMove(int toPlaceX, int toPlaceY) {
-        for (Pair<ImageView, Pair<Integer, Integer>> element: relations) {
-            if (oldPlaceX == element.getValue().getKey() &&
-                    oldPlaceY == element.getValue().getValue()) {
-                gamePanel.getChildren().remove(element.getKey());
-                if ((toPlaceY == 0 && board[oldPlaceX][oldPlaceY] == Cells.WHITE) ||
-                        (toPlaceY == 7 && board[oldPlaceX][oldPlaceY] == Cells.BLACK)) {
-                    relations.remove(element);
-                    Image imageQueen;
-                    if (toPlaceY == 0) imageQueen = new Image("main/fxml/WhiteQueen80.png");
-                    else imageQueen = new Image("main/fxml/BlackQueen80.png");
-                    ImageView viewQueen = new ImageView(imageQueen);
-                    viewQueen.relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    gamePanel.getChildren().add(viewQueen);
-                    relations.add(new Pair<>(viewQueen, new Pair<>(toPlaceX, toPlaceY)));
-                } else {
-                    element.getKey().relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
-                    gamePanel.getChildren().add(element.getKey());
-                    relations.remove(element);
-                    relations.add(new Pair<>(element.getKey(), new Pair<>(toPlaceX, toPlaceY)));
-                }
-                break;
-            }
-        }
-        int directionX = (toPlaceX - oldPlaceX) / abs(toPlaceX - oldPlaceX);
-        int directionY = (toPlaceY - oldPlaceY) / abs(toPlaceY - oldPlaceY);
-        for (;;) {
-            if (getOpponent(board[oldPlaceX + directionX][oldPlaceY + directionY]) == player) {
-                for (Pair<ImageView, Pair<Integer, Integer>> element: relations){
-                    if (oldPlaceX + directionX == element.getValue().getKey() &&
-                            oldPlaceY + directionY == element.getValue().getValue()) {
-                        gamePanel.getChildren().remove(element.getKey());
-                        relations.remove(element);
-                        break;
+            Cells[][] after = game.moveHuman(x, y);
+            for (int i=0; i < WIDTH; i++) {
+                for (int j=0; j < WIDTH; j++) {
+                    if (after[i][j] == Cells.PLACE_MOVE) {
+                        ImageView view2 = new ImageView(hatchCell);
+                        view2.relocate(i * SQUARE_SIZE, j * SQUARE_SIZE);
+                        groupHighlight.getChildren().add(view2);
                     }
                 }
-                break;
             }
-            directionX += directionX / abs(directionX);
-            directionY += directionY/ abs(directionY);
-        }
-        board = Functions.attackMove(oldPlaceX, oldPlaceY, toPlaceX, toPlaceY, board, player);
-        boardCopy = Functions.cloneBoard(board);
 
-        if (player == Cells.WHITE) {
-            blackScore++;
-            txtScore.setText(whiteScore + "-" + blackScore);
-        } else {
-            whiteScore++;
-            txtScore.setText(whiteScore + "-" + blackScore);
+            if (game.getReady()) {
+                int from = game.getFromID();
+                int to = game.getToID();
+                boolean isAttack = game.isAttack();
+                whiteScore = game.getWhiteScore();
+                blackScore = game.getBlackScore();
+                relocate(from/10, from%10, to/10, to%10, before, Player.HUMAN, isAttack);
+                gamePanel.getChildren().remove(groupHighlight);
+                groupHighlight.getChildren().clear();
+            }
+
+            gamePanel.getChildren().add(groupHighlight);
+            wait = false;
         }
 
         if (blackScore == 12) {
             winWhite();
-            turnPlayer();
         }
         else if (whiteScore == 12) {
             winBlack();
-            turnPlayer();
         }
 
-        Cells[][] possibleAgainAttack = Functions.possibleAttack(toPlaceX, toPlaceY, board, player);
-        if (Functions.boardContainsCell(possibleAgainAttack, Cells.PLACE_MOVE)) {
-            againAttack = true;
-            if (player == Cells.WHITE) {
-                boardCopy = possibleAgainAttack;
+        setTxtScore(whiteScore, blackScore);
+    }
+
+    private void relocate(int fromPlaceX, int fromPlaceY, int toPlaceX, int toPlaceY, Cells[][] board, Player curPlayer,
+                          boolean isAttack) {
+        for (Pair<ImageView, Pair<Integer, Integer>> element: relations) {
+            if (fromPlaceX == element.getValue().getKey() &&
+                    fromPlaceY == element.getValue().getValue()) {
+                gamePanel.getChildren().remove(element.getKey());
+                if ((toPlaceY == BOARD_EDGE_FOR_WHITE && board[fromPlaceX][fromPlaceY] == Cells.WHITE) ||
+                        (toPlaceY == BOARD_EDGE_FOR_BLACK && board[fromPlaceX][fromPlaceY] == Cells.BLACK)) {
+                    relations.remove(element);
+                    Image imageQueen;
+                    if (toPlaceY == BOARD_EDGE_FOR_WHITE) imageQueen = new Image("main/fxml/WhiteQueen80.png");
+                    else imageQueen = new Image("main/fxml/BlackQueen80.png");
+                    ImageView viewQueen = new ImageView(imageQueen);
+                    viewQueen.relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
+                    gamePanel.getChildren().add(viewQueen);
+                    relations.add(new Pair<>(viewQueen, new Pair<>(toPlaceX, toPlaceY)));
+                } else {
+                    element.getKey().relocate(toPlaceX * SQUARE_SIZE, toPlaceY * SQUARE_SIZE);
+                    gamePanel.getChildren().add(element.getKey());
+                    relations.remove(element);
+                    relations.add(new Pair<>(element.getKey(), new Pair<>(toPlaceX, toPlaceY)));
+                }
+                break;
             }
-            if (player == Cells.BLACK) {
-                fromAttackBotX = toPlaceX;
-                fromAttackBotY = toPlaceY;
+        }
+        if (isAttack) {
+            int directionX = (toPlaceX - fromPlaceX) / abs(toPlaceX - fromPlaceX);
+            int directionY = (toPlaceY - fromPlaceY) / abs(toPlaceY - fromPlaceY);
+            for (; ; ) {
+                if (GameBoard.getOpponent(board[fromPlaceX + directionX][fromPlaceY + directionY]) == curPlayer) {
+                    for (Pair<ImageView, Pair<Integer, Integer>> element : relations) {
+                        if (fromPlaceX + directionX == element.getValue().getKey() &&
+                                fromPlaceY + directionY == element.getValue().getValue()) {
+                            gamePanel.getChildren().remove(element.getKey());
+                            relations.remove(element);
+                            break;
+                        }
+                    }
+                    break;
+                }
+                directionX += directionX / abs(directionX);
+                directionY += directionY / abs(directionY);
             }
-        } else {
-            againAttack = false;
-            turnPlayer();
-            haveOneAttack = canMakeOneAttack();
-        }
-        wait = false;
-    }
-
-    private void turnPlayer() {
-        if (player == Cells.WHITE) {
-            player = Cells.BLACK;
-            turnImage.setImage(new Image("main/fxml/Black20.png"));
-        }
-        else {
-            player = Cells.WHITE;
-            turnImage.setImage(new Image("main/fxml/White20.png"));
         }
     }
 
-    private Cells queen(Cells player) {
-        if (player == Cells.WHITE)
-            return Cells.WHITE_QUEEN;
-        else if (player == Cells.BLACK)
-            return Cells.BLACK_QUEEN;
-        else return null;
-    }
-
-    private Cells getOpponent(Cells player) {
-        if (player == Cells.WHITE || player == Cells.WHITE_QUEEN) return Cells.BLACK;
-        else if (player == Cells.BLACK || player == Cells.BLACK_QUEEN) return Cells.WHITE;
-        else return null;
-    }
-
-    private static String toString(Cells[][] board) {
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < 8; i++) {
-            if (i % 2 == 0)
-                out.append("      ");
-            if (i % 2 == 0) {
-                out.append(board[1][i]);
-                out.append("      ");
-                out.append(board[3][i]);
-                out.append("      ");
-                out.append(board[5][i]);
-                out.append("      ");
-                out.append(board[7][i]);
-            } else {
-                out.append(board[0][i]);
-                out.append("      ");
-                out.append(board[2][i]);
-                out.append("      ");
-                out.append(board[4][i]);
-                out.append("      ");
-                out.append(board[6][i]);
-            }
-            if (i % 2 == 1)
-                out.append("      ");
-            out.append("\n");
-        }
-        return out.toString();
+    private void setTxtScore(int scoreWhite, int scoreBlack) {
+        txtScore.setText(scoreWhite + "-" + scoreBlack);
     }
 
 }
