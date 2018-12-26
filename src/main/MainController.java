@@ -16,30 +16,6 @@ import java.util.Optional;
 import static java.lang.Math.abs;
 
 public class MainController implements Cloneable {
-    public ImageView b1;
-    public ImageView b2;
-    public ImageView b3;
-    public ImageView b4;
-    public ImageView b5;
-    public ImageView b6;
-    public ImageView b7;
-    public ImageView b8;
-    public ImageView b9;
-    public ImageView b10;
-    public ImageView b11;
-    public ImageView b12;
-    public ImageView w1;
-    public ImageView w2;
-    public ImageView w3;
-    public ImageView w4;
-    public ImageView w5;
-    public ImageView w6;
-    public ImageView w7;
-    public ImageView w8;
-    public ImageView w9;
-    public ImageView w10;
-    public ImageView w11;
-    public ImageView w12;
 
     public ImageView turnImage;
     public Text txtScore;
@@ -58,7 +34,7 @@ public class MainController implements Cloneable {
     private boolean againAttack = false;
     private boolean haveAttack;
     private boolean haveCommonMoves;
-    private Cells player = Cells.BLACK;
+    private Cells player = Cells.WHITE;
     private Cells[][] board = new Cells[8][8]; //[X][Y]
     private Cells[][] boardCopy = new Cells[8][8]; //[X][Y]
     private Group groupHighlight = new Group();
@@ -66,49 +42,36 @@ public class MainController implements Cloneable {
     private List<Pair<ImageView, Pair<Integer, Integer>>> relations;
     private Image contour = new Image("main/fxml/Contour.png");
     private Image hatchCell = new Image("main/fxml/Hatching.png");
+    private Image black = new Image("main/fxml/Black80.png");
+    private Image white = new Image("main/fxml/White80.png");
 
-    private void setRelations(List<Pair<ImageView, Pair<Integer, Integer>>> list) {
-        list.add(new Pair<>(b1, new Pair<>(1, 0)));
-        list.add(new Pair<>(b2, new Pair<>(3, 0)));
-        list.add(new Pair<>(b3, new Pair<>(5, 0)));
-        list.add(new Pair<>(b4, new Pair<>(7, 0)));
-        list.add(new Pair<>(b5, new Pair<>(0, 1)));
-        list.add(new Pair<>(b6, new Pair<>(2, 1)));
-        list.add(new Pair<>(b7, new Pair<>(4, 1)));
-        list.add(new Pair<>(b8, new Pair<>(6, 1)));
-        list.add(new Pair<>(b9, new Pair<>(1, 2)));
-        list.add(new Pair<>(b10, new Pair<>(3, 2)));
-        list.add(new Pair<>(b11, new Pair<>(5, 2)));
-        list.add(new Pair<>(b12, new Pair<>(7, 2)));
-        list.add(new Pair<>(w1, new Pair<>(0, 5)));
-        list.add(new Pair<>(w2, new Pair<>(2, 5)));
-        list.add(new Pair<>(w3, new Pair<>(4, 5)));
-        list.add(new Pair<>(w4, new Pair<>(6, 5)));
-        list.add(new Pair<>(w5, new Pair<>(1, 6)));
-        list.add(new Pair<>(w6, new Pair<>(3, 6)));
-        list.add(new Pair<>(w7, new Pair<>(5, 6)));
-        list.add(new Pair<>(w8, new Pair<>(7, 6)));
-        list.add(new Pair<>(w9, new Pair<>(0, 7)));
-        list.add(new Pair<>(w10, new Pair<>(2, 7)));
-        list.add(new Pair<>(w11, new Pair<>(4, 7)));
-        list.add(new Pair<>(w12, new Pair<>(6, 7)));
-        relations = list;
-    }
-
-    private void setBoard(Cells[][] b) {
+    private void setBoard(Cells[][] b, List<Pair<ImageView, Pair<Integer, Integer>>> list) {
         for (int x=0; x<8; x++) {
             for (int y=0; y<3; y++) {
-                if ((x+y)%2==1) b[x][y] = Cells.BLACK;
+                if ((x+y)%2==1) {
+                    b[x][y] = Cells.BLACK;
+                    ImageView view = new ImageView(black);
+                    view.relocate(x*SQUARE_SIZE, y*SQUARE_SIZE);
+                    gamePanel.getChildren().add(view);
+                    list.add(new Pair<>(view, new Pair<>(x, y)));
+                }
                 else b[x][y] = Cells.EMPTY;
             }
             for (int y=3; y<5; y++) {
                 b[x][y] = Cells.EMPTY;
             }
             for (int y=5; y<8; y++) {
-                if ((x+y)%2==1) b[x][y] = Cells.WHITE;
+                if ((x+y)%2==1) {
+                    b[x][y] = Cells.WHITE;
+                    ImageView view = new ImageView(white);
+                    view.relocate(x*SQUARE_SIZE, y*SQUARE_SIZE);
+                    gamePanel.getChildren().add(view);
+                    list.add(new Pair<>(view, new Pair<>(x, y)));
+                }
                 else b[x][y] = Cells.EMPTY;
             }
         }
+        relations = list;
         board = b;
     }
 
@@ -181,30 +144,22 @@ public class MainController implements Cloneable {
         for (Pair<ImageView, Pair<Integer,Integer>> pair: relations) {
             gamePanel.getChildren().remove(pair.getKey());
         }
-        setRelations(new ArrayList<>());
-        setBoard(new Cells[8][8]);
+        setBoard(new Cells[8][8], new ArrayList<>());
         haveOneAttack = false;
         againAttack = false;
         haveAttack = false;
         haveCommonMoves = false;
         player = Cells.WHITE;
-        for (Pair<ImageView, Pair<Integer,Integer>> pair: relations) {
-            pair.getKey().relocate(pair.getValue().getKey()*SQUARE_SIZE, pair.getValue().getValue()*SQUARE_SIZE);
-            gamePanel.getChildren().add(pair.getKey());
-        }
         turnImage.setImage(new Image("main/fxml/White20.png"));
         whiteScore = 0;
         blackScore = 0;
         txtScore.setText(whiteScore + "-" + blackScore);
     }
 
-
-
     public void onMouseClicked(MouseEvent mouseEvent) {
         count++;
         if (count == 1) {
-            setBoard(new Cells[8][8]);
-            setRelations(new ArrayList<>());
+            setBoard(new Cells[8][8], new ArrayList<>());
         }
         if (player == Cells.BLACK && !wait) {
             if (!againAttack) {
@@ -443,7 +398,7 @@ public class MainController implements Cloneable {
             turnPlayer();
             haveOneAttack = canMakeOneAttack();
         }
-        wait = false;                           //Тут ошибка, когда черныйребит несколко раз
+        wait = false;
     }
 
     private void turnPlayer() {
