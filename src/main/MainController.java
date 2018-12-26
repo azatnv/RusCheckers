@@ -209,7 +209,7 @@ public class MainController implements Cloneable {
         if (player == Cells.BLACK && !wait) {
             if (!againAttack) {
                 wait = true;
-                Bot blackBot = new Bot(board);
+                Bot blackBot = new Bot(board, player);
                 blackBot.bestMove();
                 oldPlaceX = blackBot.getMoveFromX();
                 oldPlaceY = blackBot.getMoveFromY();
@@ -219,7 +219,7 @@ public class MainController implements Cloneable {
                 else commonMove(toX, toY);
             } else {
                 wait = true;
-                Bot anotherAttackBot = new Bot(board, fromAttackBotX, fromAttackBotY);
+                Bot anotherAttackBot = new Bot(board, fromAttackBotX, fromAttackBotY, player);
                 anotherAttackBot.bestMove();
                 oldPlaceX = anotherAttackBot.getMoveFromX();
                 oldPlaceY = anotherAttackBot.getMoveFromY();
@@ -241,8 +241,8 @@ public class MainController implements Cloneable {
                 groupHighlight.getChildren().clear();
                 haveAttack = false;
                 haveCommonMoves = false;
+                boardCopy = Functions.cloneBoard(board);
                 Cells[][] clone = possibleAttacks(x, y, board);
-
                 if (haveAttack) {
                     gamePanel.getChildren().add(groupHighlight);
                     boardCopy = clone;
@@ -360,6 +360,7 @@ public class MainController implements Cloneable {
             }
         }
         board = Functions.commonMove(oldPlaceX, oldPlaceY, toPlaceX, toPlaceY, board);
+        boardCopy = Functions.cloneBoard(board);
 
         turnPlayer();
         haveOneAttack = canMakeOneAttack();
@@ -408,6 +409,7 @@ public class MainController implements Cloneable {
             directionY += directionY/ abs(directionY);
         }
         board = Functions.attackMove(oldPlaceX, oldPlaceY, toPlaceX, toPlaceY, board, player);
+        boardCopy = Functions.cloneBoard(board);
 
         if (player == Cells.WHITE) {
             blackScore++;
@@ -441,7 +443,7 @@ public class MainController implements Cloneable {
             turnPlayer();
             haveOneAttack = canMakeOneAttack();
         }
-        wait = false;
+        wait = false;                           //Тут ошибка, когда черныйребит несколко раз
     }
 
     private void turnPlayer() {

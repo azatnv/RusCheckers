@@ -5,214 +5,139 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static java.lang.Math.max;
-import static java.lang.Math.min;
 import static java.lang.Math.pow;
 
 class Bot {
 
-    private Cells bot = Cells.BLACK;
-    private Cells human = Cells.WHITE;
+    private static final int maxDepth = 6;
 
-    //Оценка проводится для наилучшего расположения черных.
-    private int depth = 4;
+    private int depth;                                  //Текущая глубина этого узла
+    private ArrayList<Bot> children;                    //Дочерние узлы этого узла
+    private Cells[][] move;                             //Ход, который привел к currentBoard
+    private Cells[][] currentBoard = new Cells[8][8];
+    private Cells turn;                                 //Ходит игрок с доской currentBoard
+    private int value;                                  //Оценка позиции
 
-    private Cells[][] board = new Cells[8][8];
-    private Node root = null;
-    private Map<Cells[][], ArrayList<Cells[][]>> firstStepsAndHisMoves;
-
-    private int fromAttackX;
+    private int fromAttackX;           //Используется в констсрукторе, значащий повторную атаку для COMPUTER
     private int fromAttackY;
 
-    private boolean isAttack = false;
-    private int moveFromX;
-    private int moveFromY;
-    private int moveToX;
-    private int moveToY;
+    private boolean isAttack = false;  //move - это атака?
+    private int fromID;                //Координаты клеток, описывающие move
+    private int toID;
 
-    Bot(Cells[][] board) {
-        this.board = Functions.cloneBoard(board);
-        createTree();
+    Bot(Cells[][] board, Cells turn) {
+        this.depth = 0;
+        this.move = null;
+        this.turn = turn;
+        this.currentBoard = Functions.cloneBoard(board);
+        this.children = new ArrayList<>();
     }
 
-    Bot(Cells[][] board, int fromAttackX, int fromAttackY) {
-        this.board = Functions.possibleAttack(fromAttackX, fromAttackY, board, bot);
+    Bot(Cells[][] board, int fromAttackX, int fromAttackY, Cells turn) {
+        this.depth = 0;
+        this.move = null;
+        this.turn = turn;
+        this.currentBoard = Functions.possibleAttack(fromAttackX, fromAttackY, board, turn);
+        this.children = new ArrayList<>();
         this.fromAttackX = fromAttackX;
         this.fromAttackY = fromAttackY;
-        this.isAttack = true;
-        createTree();
+    }
+
+    private Bot(Cells[][] changedBoard, Cells[][] move, Cells turn, int depth) {
+        this.depth = depth;
+        this.move = move;
+        this.turn = turn;
+        this.currentBoard = Functions.cloneBoard(changedBoard);
+        this.children = new ArrayList<>();
+        this.isAttack = check(this.move, this.currentBoard);
+        this.fromID = findCellBot(move, Cells.BOT_FROM);
+        this.toID = findCellBot(move, Cells.BOT_TO);
     }
 
     boolean isAttack() {
         return this.isAttack;
     }
 
-    int getMoveFromX() { return this.moveFromX; }
-    int getMoveFromY() { return this.moveFromY; }
-    int getMoveToX() { return this.moveToX; }
-    int getMoveToY() { return this.moveToY; }
+    int getMoveFromX() { return this.fromID/10; }
+    int getMoveFromY() { return this.fromID%10; }
+    int getMoveToX() { return this.toID/10; }
+    int getMoveToY() { return this.toID%10; }
 
     void bestMove() {
-        int bestEval = miniMax(root, depth, -100000, 100000, bot);
-        Cells[][] bestBoard = new Cells[8][8];
-        for (Node child : root.getChildren()) {
-            if (child.getValueMinOrMax() == bestEval) {
-                bestBoard = child.getBoard();
+        int bestEval = - miniMax(-100000, 100000);
+        for (Bot child : this.children) {
+            if (child.value == bestEval) {
+                if (child.isAttack) {
+                    this.isAttack = true;
+                }
+                this.fromID = child.fromID;
+                this.toID = child.toID;
                 break;
             }
         }
-        Cells[][] bestFirstStep = new Cells[8][8];
-        for (Cells[][] firstStep: firstStepsAndHisMoves.keySet()) {
-            if (firstStepsAndHisMoves.get(firstStep).contains(bestBoard)) {
-                bestFirstStep = firstStep;
-            }
-        }
-        if (!isAttack && Functions.amountOfDifferences(bestBoard, bestFirstStep)>2) {
-            this.isAttack = true;
-        }
-        int fromID = findCellBot_From(bestFirstStep, Cells.BOT_FROM);
-        this.moveFromX = fromID / 10;
-        this.moveFromY = fromID % 10;
-        int toID = findCellBot_From(bestFirstStep, Cells.BOT_TO);
-        this.moveToX = toID / 10;
-        this.moveToY = toID % 10;
     }
 
-    private int findCellBot_From(Cells[][] board, Cells find) {
-        for (int x = 0; x < 8; x++) {
-            for (int y = 0; y < 8; y++) {
-                if (board[x][y] == find) {
-                    return x * 10 + y;
+    private int miniMax(int alpha, int beta) {
+        int a = alpha;
+        int b = beta;
+        int value;
+        Cells opponent = getOpponent(turn);
+
+        Map<Cells[][], ArrayList<Cells[][]>> table = this.findAllPossibleMoves(turn);
+
+        if (depth == Bot.maxDepth || table.isEmpty()) {
+            value = evaluation();
+            return value;
+        }
+
+        for (Cells[][] move : table.keySet()) {
+            for (Cells[][] changedBoard : table.get(move)) {
+                Bot node = new Bot(changedBoard, move, opponent, this.depth+1);
+                this.children.add(node);
+
+                value = -1 * node.miniMax(-1*b, -1*a);
+
+                a = max(a, value);
+                if(a >= beta) {
+                    this.value = a;
+                    return a;
                 }
+                b = a+1;
             }
         }
-        return -99;
+        this.value = a;
+        return a;
     }
 
-    private void createTree() {
-        root = new Node(board);
-        Map<Cells[][], ArrayList<Cells[][]>> tableFirstMoves = findAllPossibleMoves(board, bot);
-        this.firstStepsAndHisMoves = tableFirstMoves;
-
-        if (tableFirstMoves.size() > 0) {
-           createNodes(root, tableFirstMoves, bot, human);
-        }
-    }
-
-    private void createNodes(Node parent, Map<Cells[][], ArrayList<Cells[][]>> table, Cells curPlayer, Cells opponent) {
-        int curDepth = 1;
-        ArrayList<Node> start = root.getChildren();
-        while (!start.isEmpty()) {
-            start = start.get(start.size() - 1).getChildren();
-            curDepth++;
-        }
-        if (curDepth < depth) {
-            for (ArrayList<Cells[][]> moves : table.values()) {
-                for (Cells[][] move : moves) {
-                    Node nextNode = new Node(move);
-                    parent.setChild(nextNode);
-
-                    Map<Cells[][], ArrayList<Cells[][]>> nextMoves = findAllPossibleMoves(move, opponent);
-                    if (nextMoves.size() > 0) {
-                        createNodes(nextNode, nextMoves, opponent, curPlayer);
-                    }
-                }
-            }
-        }
-    }
-
-    private int miniMax(Node position, int depth, int alpha, int beta, Cells maximizingPlayer) {
-        if (depth == 0) {
-            return evaluation(position);
-        }
-        if (maximizingPlayer == bot) {
-            int maxEval = -100000;
-            for (Node child: position.getChildren()){
-                int eval = miniMax(child, depth - 1, alpha, beta, human);
-                maxEval = max(maxEval, eval);
-                alpha = max(alpha, eval);
-                if (beta <= alpha) break;
-            }
-            position.setValueMinOrMax(maxEval);
-            return maxEval;
-        } else {
-            int minEval = 100000;
-            for (Node child: position.getChildren()){
-                int eval = miniMax(child, depth - 1, alpha, beta, bot);
-                minEval = min(minEval, eval);
-                beta = min(beta, eval);
-                if (beta <= alpha) break;
-            }
-            position.setValueMinOrMax(minEval);
-            return minEval;
-        }
-    }
-
-    private int evaluation(Node end) {
-        Cells[][] endPos = end.getBoard();
+    private int evaluation() {
+        Cells[][] endPos = this.currentBoard;
         int commonWhite = 0;
         int queenWhite = 0;
         int commonBlack = 0;
         int queenBlack = 0;
-        int emptyAround = 0;
-        int lockPos = 0;
-        int unlockPos = 0;
-        int advantageInFront = 0;
-        int corner = 0;
-        int leftOrRightSide = 0;
         for (int x = 0; x < 8; x++) {
             for (int y = 0; y < 8; y++) {
                 if (endPos[x][y] == Cells.WHITE) commonWhite++;
                 if (endPos[x][y] == Cells.WHITE_QUEEN) queenWhite++;
-                if (endPos[x][y] == Cells.BLACK_QUEEN || endPos[x][y] == Cells.BLACK) {
-                    if (endPos[x][y] == Cells.BLACK) commonBlack++;
-                    if (endPos[x][y] == Cells.BLACK_QUEEN) queenBlack++;
-
-                    for (int i = 1; i < 3; i++) {
-                        int newX = (int) (x + pow(-1, i));
-                        int newY = y + 1;
-
-                        if (isOnBoard(newX, newY) && endPos[newX][newY] == Cells.EMPTY ||
-                                isOnBoard(-newX, -newY) && endPos[-newX][-newY] == Cells.EMPTY) emptyAround++;
-
-                        if (isOnBoard(newX, newY) && isOnBoard(-newX, -newY) &&
-                                (getOpponent(endPos[newX][newY]) == bot && getOpponent(endPos[-newX][-newY]) == human ||
-                                        getOpponent(endPos[newX][newY]) == human && getOpponent(endPos[-newX][-newY]) == bot ||
-                                        getOpponent(endPos[newX][newY]) == human || getOpponent(endPos[-newX][-newY]) == human))
-                            lockPos++;
-                        if (isOnBoard(newX, newY) && isOnBoard(-newX, -newY) &&
-                                (endPos[newX][newY] == Cells.EMPTY && getOpponent(endPos[-newX][-newY]) == human ||
-                                        getOpponent(endPos[newX][newY]) == human && getOpponent(endPos[-newX][-newY]) == Cells.EMPTY))
-                            unlockPos++;
-                    }
-
-                    if (y > 3 && y < 6 && x > 1 && x < 6) {
-                        if (getOpponent(endPos[x + 1][y + 1]) != Cells.BLACK && getOpponent(endPos[x - 1][y + 1]) != Cells.BLACK &&
-                                getOpponent(endPos[x + 2][y + 2]) != Cells.BLACK && getOpponent(endPos[x - 2][y + 2]) != Cells.BLACK &&
-                                getOpponent(endPos[x][y + 2]) != Cells.BLACK && getOpponent(endPos[x - 2][y]) != Cells.BLACK &&
-                                getOpponent(endPos[x + 2][y]) != Cells.BLACK)
-                            advantageInFront++;
-                    }
-
-                    if (x == 7 && y == 6 && getOpponent(endPos[6][7]) != Cells.WHITE) corner++;
-
-                    if (x == 0 && (y == 1 || y == 3 || y == 5 || y == 7) || x == 7 && (y == 2 || y == 4 || y == 6))
-                        leftOrRightSide++;
-                }
+                if (endPos[x][y] == Cells.BLACK) commonBlack++;
+                if (endPos[x][y] == Cells.BLACK_QUEEN) queenBlack++;
             }
         }
-        if (commonBlack + commonWhite < 14) return -(43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4)))
-                + 71*(commonBlack-commonWhite) + 5*lockPos - 7*unlockPos);
-        return  -(43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4))) + 50*advantageInFront +
-                5*lockPos - 7*unlockPos + (int)(0.25*emptyAround) + 89*(commonBlack-commonWhite) + 18*corner + 5*leftOrRightSide);
+        if (commonBlack + commonWhite < 14) return 43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4)))
+                + 71*(commonBlack-commonWhite);
+        return 43*(((int) (pow(4, queenBlack + 1) - 4))-((int) (pow(4, queenWhite + 1) - 4))) + 89*(commonBlack-commonWhite);
     }
 
-    private Map<Cells[][], ArrayList<Cells[][]>> findAllPossibleMoves(Cells[][] board, Cells curPlayer) {
+    /**
+    * Поиск ходов из текущей позиции currentBoard для игрока turn
+    */
+    private Map<Cells[][], ArrayList<Cells[][]>> findAllPossibleMoves(Cells curPlayer) {
         Map<Cells[][], ArrayList<Cells[][]>> firstStepRelatesWithHisMoves = new HashMap<>();
-        if (Functions.boardContainsCell(board, Cells.PLACE_MOVE)) {
+        if (Functions.boardContainsCell(this.currentBoard, Cells.PLACE_MOVE)) {
             for (int i = 0; i < 8; i++)
                 for (int j = 0; j < 8; j++) {
-                    if (board[i][j] == Cells.PLACE_MOVE) {
-                        Cells[][] onePlaceAttack = createBoardWithOnePlaceMove(board, i, j);
+                    if (this.currentBoard[i][j] == Cells.PLACE_MOVE) {
+                        Cells[][] onePlaceAttack = createBoardWithOnePlaceMove(this.currentBoard, i, j);
                         ArrayList<Cells[][]> manyMoves = Functions.consecutiveAttacksFromOnePosition(fromAttackX, fromAttackY,
                                 onePlaceAttack, curPlayer);
 
@@ -223,10 +148,10 @@ class Bot {
                     }
                 }
         } else {
-            if (Functions.canMakeOneAttack(board, curPlayer)) {
+            if (Functions.canMakeOneAttack(this.currentBoard, curPlayer)) {
                 for (int x = 0; x < 8; x++) {
                     for (int y = 0; y < 8; y++) {
-                        Cells[][] temp = Functions.possibleAttack(x, y, board, curPlayer);
+                        Cells[][] temp = Functions.possibleAttack(x, y, this.currentBoard, curPlayer);
                         for (int i = 0; i < 8; i++)
                             for (int j = 0; j < 8; j++) {
                                 if (temp[i][j] == Cells.PLACE_MOVE) {
@@ -245,7 +170,7 @@ class Bot {
             } else {
                 for (int x = 0; x < 8; x++) {
                     for (int y = 0; y < 8; y++) {
-                        Cells[][] temp = Functions.possibleCommonMoves(x, y, board, curPlayer);
+                        Cells[][] temp = Functions.possibleCommonMoves(x, y, this.currentBoard, curPlayer);
                         for (int i = 0; i < 8; i++)
                             for (int j = 0; j < 8; j++) {
                                 if (temp[i][j] == Cells.PLACE_MOVE) {
@@ -279,16 +204,25 @@ class Bot {
         return clone;
     }
 
-    private boolean isOnBoard(int x, int y) {
-        int HEIGHT = 8;
-        int WIDTH = 8;
-        return (x >= 0 && x < HEIGHT && y >= 0  && y < WIDTH);
-    }
-
     private Cells getOpponent(Cells player) {
         if (player == Cells.WHITE || player == Cells.WHITE_QUEEN) return Cells.BLACK;
         else if (player == Cells.BLACK || player == Cells.BLACK_QUEEN) return Cells.WHITE;
         else return Cells.PLACE_MOVE;
+    }
+
+    private int findCellBot(Cells[][] board, Cells find) {
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                if (board[x][y] == find) {
+                    return x * 10 + y;
+                }
+            }
+        }
+        return -99;
+    }
+
+    private boolean check(Cells[][] first, Cells[][] sec) {
+        return Functions.amountOfDifferences(first, sec) > 2;
     }
 
 }
